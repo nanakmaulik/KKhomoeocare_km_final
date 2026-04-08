@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>MEDISPHERE</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">  
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="css/style.css" rel="stylesheet">
+    <style>
+        /* Testimonial Form Styling */
+#testimonialForm {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    transition: 0.3s ease;
+}
+
+#testimonialForm:hover {
+    transform: translateY(-5px);
+}
+
+/* Inputs */
+#testimonialForm .form-control {
+    border-radius: 10px;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    transition: 0.3s;
+    font-size: 15px;
+}
+
+#testimonialForm .form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 8px rgba(13, 110, 253, 0.2);
+}
+
+/* File Input */
+#testimonialForm input[type="file"] {
+    padding: 10px;
+    background: #f8f9fa;
+    cursor: pointer;
+}
+
+/* Button */
+#testimonialForm button {
+    border-radius: 30px;
+    padding: 10px 30px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: 0.3s;
+}
+
+#testimonialForm button:hover {
+    background: #0b5ed7;
+    transform: scale(1.05);
+}
+
+/* Heading */
+#testimonialForm + p,
+h2.text-primary {
+    font-weight: 600;
+}
+
+/* Success Message */
+#successMsg {
+    font-weight: 500;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+#testimonialList img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #0d6efd;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+    </style>
+</head>
+
+<body>
+    <!-- Topbar Start -->
+    <div class="container-fluid py-2 border-bottom d-none d-lg-block">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-center text-lg-start mb-2 mb-lg-0">
+                    <div class="d-inline-flex align-items-center">
+                        <a class="text-decoration-none text-body pe-3" href=""><i class="bi bi-telephone me-2"></i>+91 6283087875</a>
+                        <span class="text-body">|</span>
+                        <a class="text-decoration-none text-body px-3" href=""><i class="bi bi-envelope me-2"></i>medisphere@gmail.com</a>
+                    </div>
+                </div>
+                <div class="col-md-6 text-center text-lg-end">
+                    <div class="d-inline-flex align-items-center">
+                        <a class="text-body px-2" href="">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a class="text-body px-2" href="">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a class="text-body px-2" href="">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a class="text-body px-2" href="">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a class="text-body ps-2" href="">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Topbar End -->
+
+
+    <!-- Navbar Start -->
+    <div class="container-fluid sticky-top bg-white shadow-sm">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg bg-white navbar-light py-3 py-lg-0">
+                <a href="index.html" class="navbar-brand">
+                    <h1 class="m-0 text-uppercase text-primary"><i class="fa fa-clinic-medical me-2"></i>Medi Sphere</h1>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <div class="navbar-nav ms-auto py-0">
+                        <a href="index.html" class="nav-item nav-link ">Home</a>
+                        <a href="about.html" class="nav-item nav-link">About</a>
+                        <a href="price.html" class="nav-item nav-link">Pricing</a>
+                        <a href="contact.html" class="nav-item nav-link">Contact</a>
+                         <a href="testimonial.html" class="nav-item nav-link active">Testimonial</a>
+                         <a href="labtest.html" class="nav-item nav-link">Lab Test</a>
+                    <a href="doctor.html" class="nav-item nav-link">Find Specialist</a>
+                     <!-- ⭐ USER ACCOUNT DROPDOWN ADDED HERE -->
+                    <li class="nav-item dropdown ms-3">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <img src="https://cdn-icons-png.flaticon.com/512/747/747376.png" 
+                                 style="width:32px; height:32px; border-radius:50%; border:2px solid #ddd; padding:2px;">
+                        </a>
+
+                        <div class="dropdown-menu dropdown-menu-end rounded shadow-sm">
+                            <a href="signin.html" class="dropdown-item">Sign In</a>
+                            <a href="signup.html" class="dropdown-item">Sign Up</a>
+                        </div>
+                    </li>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+    <!-- Navbar End -->
+
+
+    <!-- Testimonial Start -->
+      <!-- Testimonial form -->
+    
+     <div class="container py-5">
+    <div class="mx-auto" style="max-width: 600px;">
+        <h2 class="text-center mb-4 text-primary">Share Your Experience</h2>
+
+        <form id="testimonialForm">
+            <div class="mb-3">
+                <input type="text" id="name" class="form-control" placeholder="Your Name" required>
+            </div>
+
+            <div class="mb-3">
+                <textarea id="message" class="form-control" rows="4" placeholder="Your Experience" required></textarea>
+            </div>
+
+            <div class="mb-3">
+                <input type="file" id="image" class="form-control">
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary px-5">Submit Testimonial</button>
+            </div>
+        </form>
+
+        <p id="successMsg" class="text-success text-center mt-3" style="display:none;">
+            ✅ Testimonial submitted! Waiting for approval.
+        </p>
+    </div>
+</div>
+ <!-- Testimonial display -->
+    <div class="container-fluid py-5">
+        <div class="container">
+            <div class="text-center mx-auto mb-5" style="max-width: 500px;">
+                <h5 class="d-inline-block text-primary text-uppercase border-bottom border-5">Testimonial</h5>
+                <h1 class="display-4">Patients Say About Our Services</h1>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    
+                            
+                     <div class="owl-carousel testimonial-carousel" id="testimonialList">
+                     <!-- Dynamic testimonials yahan aayenge -->
+                    </div> 
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Testimonial End -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+console.log("JS Loaded");
+const supabaseClient = window.supabase.createClient(
+   "https://vwvskyxthnwscelhxvma.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ3dnNreXh0aG53c2NlbGh4dm1hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1Njk4MjQsImV4cCI6MjA4NzE0NTgyNH0.uwcDR2hTCy_17nCn4i_B7pe3L8LsdQd8pjupJpkxl9g"
+);
+console.log("Supabase Connected");
+document.getElementById("testimonialForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById("name").value;
+    const message = document.getElementById("message").value;
+    const file = document.getElementById("image").files[0];
+
+    let image_url = "";
+
+    // 🔹 Upload image to Supabase Storage
+   if (file) {
+    const fileName = Date.now() + "_" + file.name.replace(/\s+/g, "_");
+
+    const { data, error } = await supabaseClient.storage
+        .from("testimonials")
+        .upload(fileName, file, {
+            contentType: file.type
+        });
+
+    if (error) {
+        console.error("Upload Error:", error);
+        alert("Image upload failed: " + error.message);
+        return;
+    }
+
+        // Get public URL
+        const { data: publicUrl } = supabaseClient.storage
+            .from("testimonials")
+            .getPublicUrl(fileName);
+
+        image_url = publicUrl.publicUrl;
+    }
+
+    // 🔹 Insert into database
+    const { error } = await supabaseClient
+        .from("testimonials")
+        .insert([
+            {
+                name,
+                message,
+                image_url,
+                status: "pending"
+            }
+        ]);
+
+    if (error) {
+        alert("Error submitting testimonial");
+        console.error(error);
+    } else {
+        document.getElementById("testimonialForm").reset();
+        document.getElementById("successMsg").style.display = "block";
+    }
+});
+async function loadTestimonials() {
+
+    const { data, error } = await supabaseClient
+        .from("testimonials")
+        .select("*")
+        .eq("status", "approved")
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        console.log(error);
+        return;
+    }
+
+    const container = document.getElementById("testimonialList");
+    container.innerHTML = "";
+
+    data.forEach(t => {
+        container.innerHTML += `
+            <div class="testimonial-item text-center">
+                <div class="position-relative mb-4">
+                    <img class="img-fluid rounded-circle mx-auto"
+                         src="${t.image_url || 'img/default.png'}" alt="">
+                </div>
+
+                <p class="fs-5">${t.message}</p>
+
+                <hr class="w-25 mx-auto">
+
+                <h4>${t.name}</h4>
+            </div>
+        `;
+    });
+
+    // ❌ pehle destroy
+    $('.testimonial-carousel').owlCarousel('destroy');
+
+    // ✅ phir dobara init
+    $('.testimonial-carousel').owlCarousel({
+        autoplay: true,
+        smartSpeed: 1000,
+        items: 1,
+        loop: true,
+        margin: 20,
+        dots: true,
+        nav: true,
+        navText: ["<", ">"]
+    });
+}
+// page load pe call
+loadTestimonials();  
+
+</script>
+    <!-- Footer Start -->
+    <div class="container-fluid bg-dark text-light mt-5 py-5">
+        <div class="container py-5">
+            <div class="row g-5">
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="d-inline-block text-primary text-uppercase border-bottom border-5 border-secondary mb-4">Get In Touch</h4>
+                    <p class="mb-4">You can get in touch with us at our all online platforms like Whatsapp , Instagram , facebook, Linked in, twitter and mainly on our website chat box too.</p>
+                    <!-- <p class="mb-2"><i class="fa fa-map-marker-alt text-primary me-3"></i>123 Street, New York, USA</p> -->
+                    <p class="mb-2"><i class="fa fa-envelope text-primary me-3"></i>medispere@gmail.com</p>
+                    <p class="mb-0"><i class="fa fa-phone-alt text-primary me-3"></i>+91 6283087875</p>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="d-inline-block text-primary text-uppercase border-bottom border-5 border-secondary mb-4">Quick Links</h4>
+                    <div class="d-flex flex-column justify-content-start">
+                        <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Home</a>
+                        <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>About Us</a>
+                        <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Our Services</a>
+                        <!-- <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Meet The Team</a>
+                        <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Latest Blog</a> -->
+                        <a class="text-light" href="#"><i class="fa fa-angle-right me-2"></i>Contact Us</a>
+                    </div>
+                </div>
+                <!-- <div class="col-lg-3 col-md-6">
+                    <h4 class="d-inline-block text-primary text-uppercase border-bottom border-5 border-secondary mb-4">Popular Links</h4>
+                    <div class="d-flex flex-column justify-content-start">
+                        <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Home</a>
+                        <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>About Us</a>
+                        <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Our Services</a>
+                        <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Meet The Team</a>
+                        <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Latest Blog</a>
+                        <a class="text-light" href="#"><i class="fa fa-angle-right me-2"></i>Contact Us</a>
+                    </div>
+                </div> -->
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="d-inline-block text-primary text-uppercase border-bottom border-5 border-secondary mb-4">Newsletter</h4>
+                    <form action="">
+                        <div class="input-group">
+                            <input type="text" class="form-control p-3 border-0" placeholder="Your Email Address">
+                            <button class="btn btn-primary">Sign Up</button>
+                        </div>
+                    </form>
+                    <h6 class="text-primary text-uppercase mt-4 mb-3">Follow Us</h6>
+                    <div class="d-flex">
+                        <a class="btn btn-lg btn-primary btn-lg-square rounded-circle me-2" href="#"><i class="fab fa-twitter"></i></a>
+                        <a class="btn btn-lg btn-primary btn-lg-square rounded-circle me-2" href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-lg btn-primary btn-lg-square rounded-circle me-2" href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a class="btn btn-lg btn-primary btn-lg-square rounded-circle" href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid bg-dark text-light border-top border-secondary py-4">
+        <div class="container">
+            <div class="row g-5">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-md-0">&copy; <a class="text-primary" href="#">MediSphere</a>. All Rights Reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0">Designed by <a class="text-primary" href="kkcoders.co">kkcoders</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer End -->
+
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="lib/easing/easing.min.js"></script>
+    <script src="lib/waypoints/waypoints.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="lib/tempusdominus/js/moment.min.js"></script>
+    <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
+    <script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+
+    <!-- Template Javascript -->
+    <script src="js/main.js"></script>
+</body>
+
+</html>
+
+
+
+
+

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Lab Test Booking | MEDISPHERE</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <!-- Favicon -->
+    <link href="favicon.png" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    <!-- UPDATED CSS MERGED -->
+    <style>
+        body {
+            background: #F4F7FB;
+        }
+
+        .page-wrapper {
+            width: 100%;
+            max-width: 1300px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .lab-section {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start; /* ✔ FIXED */
+}
+
+        /* Left Form Section */
+        .form-card {
+            flex: 1;
+            background: #ffffff !important; /* PURE WHITE FORM */
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 20px 0 10px;
+            color: #2B5BA8;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 4px;
+        } 
+
+        input,
+        select,
+        textarea {
+            border-radius: 8px !important;
+            border: 1px solid #dce1e6 !important;
+            padding: 10px !important;
+        }
+
+        .submit-btn {
+            background: #2B5BA8;
+            padding: 12px;
+            border-radius: 8px;
+            color: #fff;
+            width: 100%;
+            border: none;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        /* Right Side Image — UPDATED */
+        .image-box {
+    flex: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+    height: 100%;       /* FULL HEIGHT OF RIGHT SECTION */
+    max-height: 600px;  /* Looks perfect with your 907x1359 image */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-box img {
+    width: auto;
+    height: 100%;
+    object-fit: contain;   /* show full image without cutting */
+}
+
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .lab-section {
+                flex-direction: column;
+            }
+
+            .image-box {
+                height: 280px;
+            }
+        }
+    
+.nav-item .dropdown-menu {
+    min-width: 150px;
+    padding: 10px 0;
+}
+
+.nav-item .dropdown-menu a {
+    font-size: 15px;
+    padding: 10px 20px;
+}
+
+.nav-item .dropdown-menu a:hover {
+    background: #eef4ff;
+    color: #0d6efd;
+}
+#timeSlotSection {
+    
+    margin-top: 15px;
+}
+</style>
+</head>
+
+<body>
+
+   <!-- Topbar Start -->
+<div class="container-fluid py-2 border-bottom d-none d-lg-block">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 text-center text-lg-start mb-2 mb-lg-0">
+                <div class="d-inline-flex align-items-center">
+                    <a class="text-decoration-none text-body pe-3" href=""><i class="bi bi-telephone me-2"></i>+91 62830 87875</a>
+                    <span class="text-body">|</span>
+                    <a class="text-decoration-none text-body px-3" href=""><i class="bi bi-envelope me-2"></i>medisphere@gmail.com</a>
+                </div>
+            </div>
+            <div class="col-md-6 text-center text-lg-end">
+                <div class="d-inline-flex align-items-center">
+                    <a class="text-body px-2" href="https://www.Instagram.com/kk_homoeo_care_">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Topbar End -->
+
+
+<!-- Navbar Start -->
+<div class="container-fluid sticky-top bg-white shadow-sm">
+    <div class="container">
+        <nav class="navbar navbar-expand-lg bg-white navbar-light py-3 py-lg-0">
+            <a href="index.html" class="navbar-brand">
+                <h1 class="m-0 text-uppercase text-primary"><i class="fa fa-clinic-medical me-2"></i>MEDI SPHERE</h1>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                
+                <div class="navbar-nav ms-auto py-0">
+                    <a href="index.html" class="nav-item nav-link ">Home</a>
+                    <a href="about.html" class="nav-item nav-link">About</a>
+                    <a href="price.html" class="nav-item nav-link">Pricing</a>
+                    <a href="contact.html" class="nav-item nav-link">Contact</a>
+                    <a href="testimonial.html" class="nav-item nav-link ">Testimonial</a>
+                    <a href="labtest.html" class="nav-item nav-link active">Lab Test</a>
+                    <a href="doctor.html" class="nav-item nav-link">Find Specialist</a>
+
+                    <!-- ⭐ USER ACCOUNT DROPDOWN ADDED HERE -->
+                    <li class="nav-item dropdown ms-3">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <img src="https://cdn-icons-png.flaticon.com/512/747/747376.png" 
+                                 style="width:32px; height:32px; border-radius:50%; border:2px solid #ddd; padding:2px;">
+                        </a>
+
+                        <div class="dropdown-menu dropdown-menu-end rounded shadow-sm">
+                            <a href="signin.html" class="dropdown-item">Sign In</a>
+                            <a href="signup.html" class="dropdown-item">Sign Up</a>
+                        </div>
+                    </li>
+                </div>
+            </div>
+        </nav>
+    </div>
+</div>
+<!-- Navbar End -->
+
+    <!-- MAIN LAB TEST SECTION -->
+    <div class="page-wrapper">
+
+        <div class="text-center mb-4">
+            <h2 class="text-primary fw-bold">Book Your Lab Test</h2>
+            <p class="text-muted">Fast • Accurate • Trusted Diagnostics</p>
+        </div>
+
+        <div class="lab-section">
+
+            <!-- LEFT: FORM -->
+          <div class="form-card">
+
+    <div class="section-title">Personal Information</div>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label>Full Name</label>
+            <input id="fullName" type="text" class="form-control" placeholder="Enter full name">
+        </div>
+        <div class="col-md-6 mb-3">
+            <label>Phone Number</label>
+            <input id="phone" type="tel" class="form-control" placeholder="Enter phone number">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label>Email</label>
+            <input id="email" type="email" class="form-control" placeholder="Enter email">
+        </div>
+        
+    </div>
+
+    <div class="section-title">Test Details</div>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label>Select Test</label>
+            <select id="test" class="form-control">
+                <option>Select Test</option>
+                <option>CBC</option>
+                <option>Thyroid Profile (T3, T4, TSH)</option>
+                <option>Lipid Profile</option>
+                <option>Liver Function Test</option>
+                <option>Kidney Function Test</option>
+                <option>Vitamin D</option>
+            </select>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label>Preferred Date</label>
+            <input id="preferredDate" type="date" class="form-control">
+        </div>
+    </div>
+    <div class="section-title">Sample Collection Type</div>
+
+<div class="mb-3">
+    <input type="radio" name="collectionType" value="Home Sample" id="homeSample" onchange="toggleTimeSlot()">
+<label for="homeSample">Home Sample Collection</label>
+</div>
+
+<div class="mb-3">
+    <input type="radio" name="collectionType" value="Lab Visit" id="labVisit" onchange="toggleTimeSlot()">
+<label for="labVisit">Visit Lab</label>
+</div>
+<div id="timeSlotSection" >
+        <div class="section-title">Select Time Slot</div>
+    <select id="timeSlot" name="time_slot" class="form-control mb-3">
+    <option value="">Select Time Slot</option>
+    <option>08:00 AM - 10:00 AM</option>
+    <option>10:00 AM - 12:00 PM</option>
+    <option>12:00 PM - 02:00 PM</option>
+    <option>02:00 PM - 04:00 PM</option>
+    <option>04:00 PM - 06:00 PM</option>
+</select>
+</div>
+
+    <div class="section-title">Address</div>
+    <textarea id="address" class="form-control mb-3" rows="2" placeholder="Enter complete address"></textarea>
+
+    <div class="section-title">Upload Prescription (Optional)</div>
+    <input id="prescription" type="file" class="form-control mb-3">
+
+    <button id="submitBtn" class="submit-btn">Confirm Booking</button>
+</div>
+
+            <!-- RIGHT: IMAGE -->
+            <div class="image-box">
+    <img src="img/lab1.jpg" alt="Lab Test">
+</div>
+        </div>        <!-- closes lab-section -->
+    </div>            <!-- closes page-wrapper -->
+
+    <!-- FOOTER -->
+    <div class="container-fluid bg-dark text-light mt-5 py-5">
+        <div class="container py-5">
+            <div class="row g-5">
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="d-inline-block text-primary text-uppercase border-bottom border-5 border-secondary mb-4">Get In Touch</h4>
+                    <p class="mb-4">You can get in touch with us at our all online platforms like Whatsapp , Instagram , facebook, Linked in, twitter and mainly on our website chat box too.</p>
+                    <p class="mb-2"><i class="fa fa-envelope text-primary me-3"></i>medispere@gmail.com</p>
+                    <p class="mb-0"><i class="fa fa-phone-alt text-primary me-3"></i>+91 62830 87875</p>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="d-inline-block text-primary text-uppercase border-bottom border-5 border-secondary mb-4">Quick Links</h4>
+                    <div class="d-flex flex-column justify-content-start">
+                        <a class="text-light mb-2" href="index.html"><i class="fa fa-angle-right me-2"></i>Home</a>
+                        <a class="text-light mb-2" href="about.html"><i class="fa fa-angle-right me-2"></i>About Us</a>
+                        <a class="text-light mb-2" href="service.html"><i class="fa fa-angle-right me-2"></i>Our Services</a>
+                        <a class="text-light" href="contact.html"><i class="fa fa-angle-right me-2"></i>Contact Us</a>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="d-inline-block text-primary text-uppercase border-bottom border-5 border-secondary mb-4">Newsletter</h4>
+                    <form action="">
+                        <div class="input-group">
+                            <input type="text" class="form-control p-3 border-0" placeholder="Your Email Address">
+                            <button class="btn btn-primary">Sign Up</button>
+                        </div>
+                    </form>
+                    <h6 class="text-primary text-uppercase mt-4 mb-3">Follow Us</h6>
+                    <div class="d-flex">
+                        <a class="btn btn-lg btn-primary btn-lg-square rounded-circle" href="https://www.Instagram.com/kk_homoeo_care_"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid bg-dark text-light border-top border-secondary py-4">
+        <div class="container">
+            <div class="row g-5">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-md-0">&copy; <a class="text-primary" href="#">Medi Sphere</a>. All Rights Reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0">Designed by <a class="text-primary" href="kkcoders.co">kkcoders</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer End -->
+
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="lib/easing/easing.min.js"></script>
+    <script src="lib/waypoints/waypoints.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="lib/tempusdominus/js/moment.min.js"></script>
+    <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
+    <script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+
+   
+   
+        <!-- Template Javascript -->
+    <script src="js/main.js"></script>
+
+    
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+// ---- CREATE CLIENT SAFELY ----
+const client = supabase.createClient(
+    "https://vwvskyxthnwscelhxvma.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ3dnNreXh0aG53c2NlbGh4dm1hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1Njk4MjQsImV4cCI6MjA4NzE0NTgyNH0.uwcDR2hTCy_17nCn4i_B7pe3L8LsdQd8pjupJpkxl9g"
+);
+
+document.getElementById("submitBtn").addEventListener("click", async () => {
+
+    const fullName = document.getElementById("fullName").value;
+    const phone = document.getElementById("phone").value;
+    const email = document.getElementById("email").value;
+    const test = document.getElementById("test").value;
+    const preferredDate = document.getElementById("preferredDate").value;
+    const collectionType = document.querySelector('input[name="collectionType"]:checked')?.value;
+    const timeSlot = document.getElementById("timeSlot").value;
+    const address = document.getElementById("address").value;
+    const prescriptionFile = document.getElementById("prescription").files[0];
+
+    // ---- FIX DATE FORMAT ----
+    let correctDate = preferredDate; // YYYY-MM-DD (browser already gives correct)
+    
+    // ---- UPLOAD PRESCRIPTION ----
+    let prescriptionUrl = null;
+
+    if (prescriptionFile) {
+        const fileName = Date.now() + "_" + prescriptionFile.name;
+
+        const { data: uploadData, error: uploadError } = await client
+            .storage
+            .from("prescriptions")  // bucket name must exist
+            .upload(fileName, prescriptionFile);
+
+        if (uploadError) {
+            alert("Failed to upload prescription");
+            console.log(uploadError);
+            return;
+        }
+
+        prescriptionUrl = client
+            .storage
+            .from("prescriptions")
+            .getPublicUrl(fileName).data.publicUrl;
+    }
+    if (!collectionType) {
+    alert("Please select sample collection type");
+    return;
+}
+if (collectionType === "Home Sample" && !timeSlot) {
+    alert("Please select time slot for home collection");
+    return;
+}
+
+   const { data, error } = await client
+  .from("labtestbookings")
+  .insert([
+    {
+      name: fullName,
+      phone: phone,
+      email: email,
+      test: test,
+      preferreddate: correctDate,
+      address: address,
+      prescription: prescriptionUrl,
+      collection_type: collectionType,
+      time_slot: timeSlot
+    }
+  ]);
+
+    if (error) {
+        alert("Error saving booking!");
+        console.log(error);
+    } else {
+        alert("Lab Test Booked Successfully!");
+    }
+
+});
+// ---- DISABLE PAST DATES ----
+const today = new Date().toISOString().split("T")[0];
+document.getElementById("preferredDate").setAttribute("min", today);
+
+function toggleTimeSlot() {
+    document.getElementById("timeSlotSection").style.display = "block";
+}
+</script>
+
+</body>
+</html>
+
+
