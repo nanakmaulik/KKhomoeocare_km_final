@@ -31,8 +31,10 @@ const openai = new OpenAI({
 });
 
 /******************************
+ * 
  * SUPABASE
  ******************************/
+
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY,
@@ -52,7 +54,7 @@ const supabase = createClient(
  * GOOGLE CALENDAR (MEET LINK)
  ******************************/
 const SCOPES = ["https://www.googleapis.com/auth/calendar"];
-const CREDENTIALS_PATH = path.join(process.cwd(), "backend", "credentials.json");
+const CREDENTIALS_PATH = path.join(process.cwd(), "credentials.json");
 let authClient = null;
 
 async function getAuth() {
@@ -101,15 +103,22 @@ async function createMeetLink(date, time) {
 
 async function getMeetLinkSafely(date, time) {
   try {
+    console.log("CREDENTIALS PATH:", CREDENTIALS_PATH);
+    console.log("CREDENTIALS EXISTS:", fs.existsSync(CREDENTIALS_PATH));
+    console.log("Trying to create meet for:", date, time);
+
     if (!fs.existsSync(CREDENTIALS_PATH)) {
       console.warn("credentials.json not found. Using demo meet link.");
       return "https://meet.google.com/demo-link";
     }
 
     const link = await createMeetLink(date, time);
+    console.log("REAL MEET LINK:", link);
+
     return link || "https://meet.google.com/demo-link";
   } catch (err) {
-    console.error("Meet link generation failed, using fallback link:", err.message);
+    console.error("Meet link generation failed, using fallback link:");
+    console.error(err);
     return "https://meet.google.com/demo-link";
   }
 }
