@@ -1580,7 +1580,7 @@ window.approveDoctorRequest = async function (requestId) {
      *  ✅ STEP 1 (EMAIL CALL) — ADD HERE!!
      ***************************************/
     try {
-        const response = await fetch("http://localhost:5000/send-approval-email", {
+        const response = await fetch("http://https://kkhomoeocare-km-final-1.onrender.com/send-approval-email", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

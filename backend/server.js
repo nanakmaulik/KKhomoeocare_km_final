@@ -18,12 +18,27 @@ import { authenticate } from "@google-cloud/local-auth";
 import { google } from "googleapis";
 
 dotenv.config();
+const FRONTEND_URL =
+  process.env.FRONTEND_URL || "https://nanakmaulik.github.io/KKhomoeocare_km_final";
+
+const BACKEND_URL =
+  process.env.BACKEND_URL || "https://kkhomoeocare-km-final-1.onrender.com";
 
 /******************************
  * EXPRESS SETUP
  ******************************/
 const app = express();
-app.use(cors({ origin: "*" }));
+app.use(cors({
+  origin: [
+    "http://127.0.0.1:5501",
+    "http://localhost:5501",
+    "https://nanakmaulik.github.io",
+    "https://nanakmaulik.github.io/KKhomoeocare_km_final",
+    FRONTEND_URL
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  credentials: true
+}));
 app.use(express.json());
 
 const openai = new OpenAI({
@@ -392,7 +407,7 @@ console.log("Email:", email, "Name:", name);
 
           <p>You can now login and start using <b>MediSphere</b>.</p>
 
-          <a href="http://localhost:5500/admin-login.html"
+          <a href="${FRONTEND_URL}/admin-login.html"
              style="display:inline-block; padding:10px 20px; background:#2879ff; color:white; text-decoration:none; border-radius:6px;">
              Login Now
           </a>
@@ -474,8 +489,7 @@ app.post("/create-payment", async (req, res) => {
         customer_phone: phone
       },
       order_meta: {
-       return_url: `http://127.0.0.1:5501/KKhomoeocare_km_final-newbranch%20(1)%202/payment-success.html?order_id=${order_id}`
-      }
+        return_url: `${FRONTEND_URL}/payment-success.html?order_id=${order_id}`      }
     };
 
     const response = await fetch(baseUrl, {
@@ -556,6 +570,12 @@ app.post("/verify-payment", async (req, res) => {
 
     if (payment.appointmentType === "online") {
       meetLink = await getMeetLinkSafely(payment.appointmentdate, payment.appointmenttime);
+    }
+    if (payment.appointmentType === "online" && !meetLink) {
+      return res.status(500).json({
+        success: false,
+        message: "Meet link generation failed. Appointment not confirmed."
+      });
     }
 
     const { data: doctor } = await supabase
@@ -651,7 +671,7 @@ app.post("/create-package-payment", async (req, res) => {
         customer_phone: phone
       },
       order_meta: {
-        return_url: `http://127.0.0.1:5501/KKhomoeocare_km_final-newbranch%20(1)%202/package-payment-success.html?order_id=${order_id}`
+        return_url: `${FRONTEND_URL}/package-payment-success.html?order_id=${order_id}`
       }
     };
 
@@ -787,6 +807,8 @@ app.post("/verify-package-payment", async (req, res) => {
 /******************************
  * START SERVER
  ******************************/
-app.listen(5000, () => {
-  console.log("Server running on port 5000 🚀");
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT} 🚀`);
 });

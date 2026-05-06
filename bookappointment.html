@@ -960,7 +960,7 @@ if (!session) {
   const appointmentdate = selectedDate;
   const appointmenttime = activeSlot.textContent.trim();
 
-  const response = await fetch("http://localhost:5000/create-payment", {
+  const response = await fetch("http://https://kkhomoeocare-km-final-1.onrender.com/create-payment", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -1039,8 +1039,8 @@ if (enteredEmail !== loggedInEmail) {
 
   const apiUrl =
   appointmentType === "online"
-    ? "http://localhost:5000/book-online-appointment"
-    : "http://localhost:5000/book-offline-appointment";
+    ? "http://https://kkhomoeocare-km-final-1.onrender.com/book-online-appointment"
+    : "http://https://kkhomoeocare-km-final-1.onrender.com/book-offline-appointment";
 
       try {
   const response = await fetch(apiUrl, {
