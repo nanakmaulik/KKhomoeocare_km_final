@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Doctor Profile</title>
+
+    <style>
+        /* ===== GLOBAL ===== */
+        body {
+            font-family: "Inter", sans-serif;
+            background: #f0f4f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .page-container {
+            max-width: 1250px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        /* ===== DOCTOR HEADER (FULL-WIDTH PRO LOOK) ===== */
+        .doctor-header {
+            display: flex;
+            padding: 30px;
+            background: #ffffff;
+            border-radius: 10px;
+            border: 1px solid #d5dde6;
+            align-items: center;
+            gap: 25px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.06);
+            margin-bottom: 25px;
+        }
+
+        .doctor-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 100%;
+            background: #e1e8f0;
+            border: 3px solid #d7e3f4;
+            object-fit: cover;
+        }
+
+        .doc-head-content h1 {
+            font-size: 32px;
+            margin: 0;
+            color: #0e2a47;
+        }
+
+        .designation {
+            font-size: 15px;
+            color: #5c6b7a;
+            margin-top: 4px;
+        }
+
+        .speciality-tag {
+            display: inline-block;
+            background: #e6f0ff;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #004a94;
+            margin-top: 10px;
+        }
+
+        /* ===== MAIN CONTENT SPLIT ===== */
+        .content-split {
+            display: flex;
+            gap: 25px;
+        }
+
+        .left-side {
+            width: 65%;
+        }
+
+        .right-side {
+            width: 35%;
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 22px;
+            border: 1px solid #d9e2ec;
+            box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.04);
+        }
+
+        .card h2 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: #0e2a47;
+        }
+
+        .card p,
+        .card li {
+            font-size: 15.5px;
+            line-height: 1.7;
+            color: #2f3b4a;
+        }
+
+        /* ===== INFO BOXES (Experience / Fees) ===== */
+        .info-boxes {
+            display: flex;
+            gap: 15px;
+        }
+
+        .info-box {
+            flex: 1;
+            background: #fff;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            border: 1px solid #d9e2ec;
+            box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .info-box h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #5c6b7a;
+            margin-bottom: 8px;
+        }
+
+        .info-box p {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0b3b78;
+        }
+
+        /* ===== APPOINTMENT SECTION ===== */
+        .appointment-card h2 {
+            margin-bottom: 18px;
+        }
+
+        .appointment-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .appointment-btn {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #bfd0e7;
+            background: #eef4ff;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            color: #0c2f57;
+            transition: 0.25s;
+        }
+
+        .appointment-btn.active,
+        .appointment-btn:hover {
+            background: #d9e8ff;
+            border-color: #8ab4f8;
+        }
+
+        .no-slot-box {
+            background: #f3f6fa;
+            border: 1px solid #d7dfeb;
+            padding: 16px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            color: #5b6775;
+        }
+
+        .callback-btn {
+            width: 100%;
+            padding: 14px;
+            background: #0a4dbf;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .callback-btn:hover {
+            background: #083f99;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="page-container">
+
+        <!-- DOCTOR HEADER -->
+        <div class="doctor-header">
+            <img src="https://via.placeholder.com/150" class="doctor-img" />
+
+            <div class="doc-head-content">
+                <h1>Dr. Anoop Misra</h1>
+                <p class="designation">EXECUTIVE CHAIRMAN — Fortis C-DOC</p>
+
+                <span class="speciality-tag">Diabetology | Endocrinology</span>
+            </div>
+        </div>
+
+        <!-- CONTENT (LEFT + RIGHT) -->
+        <div class="content-split">
+
+            <!-- LEFT SIDE -->
+            <div class="left-side">
+
+                <div class="card">
+                    <h2>About</h2>
+                    <p>
+                        Prof. (Dr.) Anoop Misra is Chairman of Fortis C-DOC Hospital for Diabetes and Allied Sciences.
+                        Former Professor (Medicine) at AIIMS, New Delhi. Renowned specialist in Diabetes and
+                        Endocrinology.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h2>Education</h2>
+                    <ul>
+                        <li>MBBS — AIIMS, New Delhi</li>
+                        <li>MD (Medicine) — AIIMS, New Delhi</li>
+                        <li>DM (Endocrinology) — AIIMS, New Delhi</li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- RIGHT SIDE -->
+            <div class="right-side">
+
+                <div class="info-boxes">
+                    <div class="info-box">
+                        <h3>Experience</h3>
+                        <p>40 Years</p>
+                    </div>
+
+                    <div class="info-box">
+                        <h3>Fees</h3>
+                        <p>₹ 2800</p>
+                    </div>
+                </div>
+
+                <div class="card appointment-card">
+                    <h2>Schedule Appointment</h2>
+
+                    <div class="appointment-buttons">
+                        <button class="appointment-btn active">Hospital Visit</button>
+                        <button class="appointment-btn">Video Consult</button>
+                    </div>
+
+                    <div class="no-slot-box">
+                        No hospital visit slots available currently.<br />
+                        Please request a callback.
+                    </div>
+
+                    <button class="callback-btn">Book Appointment</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

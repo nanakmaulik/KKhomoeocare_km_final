@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Payment Success</title>
+</head>
+<body>
+  <h2>Confirming your appointment...</h2>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const order_id = params.get("order_id");
+
+    async function verifyPayment() {
+      const res = await fetch("http://localhost:5000/verify-payment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ order_id })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        alert("Payment successful and appointment confirmed!");
+        window.location.href = "appointmentsuccess.html";
+      } else {
+        alert(data.message || "Payment verification failed");
+      }
+    }
+
+    verifyPayment();
+  </script>
+</body>
+</html>

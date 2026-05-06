@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MediSphere Admin Dashboard</title>
+<script>
+    if (localStorage.getItem("adminLoggedIn") !== "true") {
+        window.location.href = "admin-login.html";
+    }
+</script>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+
+body{
+background:#f4f7fb;
+font-family:Segoe UI;
+margin:0;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+width:240px;
+height:100vh;
+background:#1d2b53;
+position:fixed;
+color:white;
+padding-top:30px;
+}
+
+.sidebar h3{
+text-align:center;
+margin-bottom:40px;
+}
+
+.menu{
+padding:12px 20px;
+cursor:pointer;
+color:#ddd;
+transition:0.3s;
+}
+
+.menu:hover{
+background:#111d40;
+color:white;
+}
+
+/* CONTENT */
+
+.content{
+margin-left:260px;
+padding:40px;
+}
+
+.card{
+border-radius:12px;
+box-shadow:0 6px 16px rgba(0,0,0,0.08);
+border:none;
+}
+
+.page{
+display:none;
+}
+
+.active{
+display:block;
+}
+/* DOCTOR CARD FIX */
+
+#doctorContainer .col-md-4{
+display:flex;
+}
+
+#doctorContainer .card{
+width:100%;
+height:100%;
+display:flex;
+flex-direction:column;
+}
+
+#doctorContainer .card img{
+height:200px;
+object-fit:cover;
+}
+
+#doctorContainer .card h4{
+font-size:20px;
+margin-top:10px;
+}
+
+#doctorContainer .card p{
+margin:2px 0;
+flex-grow:1;
+}
+.slot-pill{
+background:#1d2b53;
+color:white;
+padding:8px 12px;
+border-radius:20px;
+display:inline-block;
+margin:6px;
+}
+
+.removeSlot{
+margin-left:10px;
+cursor:pointer;
+color:red;
+font-weight:bold;
+}
+.user-card {
+    border-radius: 12px;
+    background: white;
+    border: none;
+}
+/* LAB TEST BOOKING CARDS */
+.lab-card {
+    border: none;
+    border-radius: 14px;
+    padding: 20px;
+    background: #ffffff;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    transition: 0.3s;
+
+    height: 100%;  
+    width:100%;            /* FIX 1: equal height */
+    display: flex;             /* FIX 2 */
+    flex-direction: column;    /* FIX 3 */
+    justify-content: space-between;
+}
+
+.lab-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+/* Test Title */
+.lab-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1d2b53;
+    margin-bottom: 10px;
+}
+#labtestContainer .col-md-4 {
+    display: flex;
+}
+
+#labtestContainer .lab-card {
+    flex: 1;
+}
+
+/* Info lines */
+.lab-info {
+    font-size: 14px;
+    margin: 4px 0;
+    color: #444;
+}
+
+/* Label bold */
+.lab-info strong {
+    color: #000;
+}
+
+/* Prescription button */
+.prescription-btn {
+    background: #1d2b53;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    display: inline-block;
+    margin-top: 6px;
+    transition: 0.3s;
+}
+
+.prescription-btn:hover {
+    background: #111d40;
+}
+
+/* Date and footer text */
+.lab-date {
+    font-size: 13px;
+    color: #666;
+    margin-top: 10px;
+}
+/* slot display page css */
+.slot-doctor-card{
+    background:#fff;
+    border-radius:14px;
+    padding:18px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.08);
+    border:none;
+    height:100%;
+}
+
+.slot-doctor-card h4{
+    font-size:18px;
+    font-weight:800;
+    color:#1d2b53;
+    margin-bottom:4px;
+}
+
+.slot-doctor-card p{
+    margin:0;
+    font-size:14px;
+    color:#555;
+    font-weight:600;
+}
+
+.month-title{
+    margin-top:14px;
+    font-size:15px;
+    font-weight:800;
+    color:#0066ff;
+    border-left:4px solid #0066ff;
+    padding-left:10px;
+}
+
+.slot-badge{
+    display:inline-block;
+    background:#f0f4ff;
+    border:1px solid #d8e1ff;
+    color:#1d2b53;
+    padding:6px 10px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:700;
+    margin:5px 6px 0 0;
+}
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-block;
+}
+
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-confirmed {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.status-completed {
+    background: #d4edda;
+    color: #155724;
+}
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+<h3>MediSphere</h3>
+
+<div class="menu" onclick="showPage('addDoctor')">
+➕ Add Doctor
+</div>
+
+<div class="menu" onclick="showPage('doctorList')">
+👨‍⚕️ Doctors List
+</div>
+<div class="menu" onclick="showPage('editprofile')">
+👨Edit Profile
+</div>
+
+<div class="menu" onclick="showPage('slotsPage')">
+📅 Manage Slots
+</div>
+<div class="menu" onclick="showPage('userListPage')">
+👥 Users List
+</div>
+<div class="menu" onclick="showPage('labtestPage')">
+🧪 Lab Test Bookings
+</div>
+<div class="menu" onclick="showPage('appointmentPage'); loadAppointments();">
+    📅 Appointments
+</div>
+<div class="menu" onclick="showPage('basicAppointmentPage'); loadBasicAppointments();">
+📌 Basic Appointments
+</div>
+<div class="menu" onclick="showPage('doctorSlotListPage'); window.loadDoctorSlotsMonthWise();">
+📅 Doctor Slots (Month Wise)
+</div>
+<div class="menu" onclick="showPage('serviceBookingPage'); loadServiceBookings();">
+💳 Service Bookings
+</div>
+<div class="menu" onclick="showPage('testimonialPage'); loadTestimonials();">
+⭐ Testimonials
+</div>
+<div class="menu" onclick="logoutAdmin()">
+🚪 Logout
+</div>
+</div>
+
+
+<!-- CONTENT -->
+
+<div class="content">
+
+<!-- ADD DOCTOR -->
+
+<div id="addDoctor" class="page active">
+
+<h2>Add Doctor Profile</h2>
+
+<div class="card p-4 mt-3">
+
+<label>Name</label>
+<input id="name" class="form-control mb-2">
+
+<label>Email</label>
+<input id="email" class="form-control mb-2">
+
+<label>Specialization</label>
+<input id="spec" class="form-control mb-2">
+
+<label>Experience</label>
+<input id="exp" class="form-control mb-2">
+
+<label>Fees</label>
+<input id="fees" class="form-control mb-2">
+
+<label>About</label>
+<textarea id="about" class="form-control mb-2"></textarea>
+
+<label>Rating</label>
+<input id="rating" class="form-control mb-2" type="number" step="0.1" min="0" max="5">
+
+<label>Patients</label>
+<input id="patients" class="form-control mb-2" type="number" min="0">
+
+<label>Doctor Image</label>
+<input type="file" id="photo" class="form-control mb-3">
+
+<button class="btn btn-primary w-100" id="addDoctorBtn">
+Save Doctor
+</button>
+
+</div>
+</div>
+<!-- MANAGE SLOTS PAGE -->
+
+<div id="slotsPage" class="page">
+
+<h2>Manage Doctor Slots</h2>
+
+<div class="card mt-3">
+
+<h5 id="slotDoctorName"></h5>
+
+<label>Select Date:</label>
+<input type="date" id="slotDate" class="form-control mb-3" min="">
+
+<label>Add Time Slot:</label>
+<input type="time" id="slotTime" class="form-control mb-3">
+
+<button onclick="addSlot()" class="btn btn-dark w-100 mb-3">
+Add Slot
+</button>
+
+<h5>Current Slots:</h5>
+
+<div id="slotContainer"></div>
+
+<button onclick="saveSlots()" class="btn btn-success w-100 mt-3">
+Save Slots
+</button>
+
+</div>
+
+</div>
+<!-- EDIT PROFILE -->
+ <div id="editprofile" class="page">
+            <h2>Edit Doctor Profile</h2>
+
+            <div class="card mt-3">
+                <label>Name:</label>
+                <input id="editName" class="form-control mb-2">
+       
+                 <label>Email</label>
+                <input id="editMail" class="form-control mb-2">
+
+                <label>Specialisation:</label>
+                <input id="editSpec" class="form-control mb-2">
+
+                <label>Experience:</label>
+                <input id="editExp" class="form-control mb-2">
+
+                <label>Fees:</label>
+                <input id="editFees" class="form-control mb-2">
+
+                <label>About:</label>
+                <textarea id="editabout" class="form-control mb-2" rows="4"></textarea>
+
+                <label>Rating</label>
+                <input id="editRating" class="form-control mb-2" type="number" step="0.1" min="0" max="5">
+
+                <label>Patients</label>
+                <input id="editPatients" class="form-control mb-2" type="number" min="0">
+
+                <label>Image URL:</label>
+                <input id="editImg" class="form-control mb-2">
+
+                <button onclick="updateDoctor()" class="btn btn-primary w-100 mt-3">Update Profile</button>
+            </div>
+        </div>
+
+        <!-- USER LIST -->
+         <div id="userListPage" class="page">
+    <h2>All Registered Users</h2>
+
+    <div id="usersContainer" class="row mt-4"></div>
+</div>
+<!-- LABTEST BOOKING LIST -->
+<div id="labtestPage" class="page">
+    <h2>Lab Test Bookings</h2>
+    <div id="labtestContainer" class="row g-4 mt-4"></div>
+</div>
+<!-- APPOINTMENT LIST -->
+<div id="appointmentPage" class="page">
+    <h3 class="mb-4">Appointments</h3>
+   <div class="row g-4 mt-4" id="appointmentList"></div>
+</div>
+<!-- BASICAPPOINTMENT LIST -->
+<div id="basicAppointmentPage" class="page">
+    <h3 class="mb-4">Basic Appointments</h3>
+    <div class="row g-4 mt-4" id="basicAppointmentList"></div>
+</div>
+<!-- slot display LIST -->
+<div id="doctorSlotListPage" class="page">
+  <h2>Doctor Slots (Month Wise)</h2>
+
+  <!-- ✅ Month Dropdown -->
+  <select id="monthSelect" class="form-select mt-3 mb-3" style="max-width:300px;">
+  </select>
+
+  <div id="doctorSlotListContainer" class="row mt-4"></div>
+</div>
+ <!-- Testimonials -->
+<div id="testimonialPage" class="page">
+    <h2>Manage Testimonials</h2>
+    <div id="testimonialContainer" class="row mt-4"></div>
+</div>
+<!-- SERVICE BOOKINGS -->
+<div id="serviceBookingPage" class="page">
+  <h2>Service Bookings</h2>
+  <div id="serviceBookingContainer" class="row g-4 mt-4"></div>
+</div>
+<!-- DOCTOR LIST -->
+
+<div id="doctorList" class="page">
+
+<h2>All Doctors</h2>
+
+<div id="doctorContainer" class="row mt-4"></div>
+</div>
+
+
+</div>
+
+<script>
+    
+
+function showPage(id){
+
+document.querySelectorAll(".page").forEach(p=>{
+p.classList.remove("active")
+})
+
+document.getElementById(id).classList.add("active")
+
+}
+
+</script>
+
+
+
+<!-- SUPABASE SCRIPT -->
+
+<script type="module">
+
+import { supabase } from "./js/supabase.js";
+function toDBDate(dateStr) {
+    // If format already YYYY-MM-DD, return as is
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+        return dateStr;
+    }
+
+    // If accidentally DD-MM-YYYY came
+    if (dateStr.includes("-")) {
+        const [day, month, year] = dateStr.split("-");
+        return `${year}-${month}-${day}`;
+    }
+
+    // If natural date (Mar 17 2024)
+    const d = new Date(dateStr);
+    return d.toISOString().split("T")[0];
+}
+
+
+
+  /* LOAD USERS */
+ async function loadUsers() {
+    const { data, error } = await supabase
+        .from("users")
+        .select("*");
+
+    const container = document.getElementById("usersContainer");
+    container.innerHTML = "";
+
+    data.forEach(user => {
+        container.innerHTML += `
+            <div class="col-md-4">
+                <div class="card p-3 user-card shadow-sm mb-4">
+
+                    <h5 class="mb-2">👤 ${user.name || "No Name"}</h5>
+
+                    <p><strong>Email:</strong> ${user.email}</p>
+                    <p><strong>Phone:</strong> ${user.phone || "Not Provided"}</p>
+
+                    <p><strong>Joined:</strong> 
+                        ${new Date(user.created_at).toLocaleDateString()}
+                    </p>
+
+                </div>
+            </div>
+        `;
+    });
+}
+/* LOAD DOCTORS */
+async function loadDoctors(){
+
+const { data, error } = await supabase
+.from("doctors")
+.select("*")
+.eq("is_deleted", false)
+if(error){
+console.log(error)
+return
+}
+
+const container = document.getElementById("doctorContainer")
+container.innerHTML=""
+
+if(data){
+data.forEach(doc=>{
+
+container.innerHTML += `
+
+<div class="col-md-4 mb-4">
+
+<div class="card doctor-card p-3">
+
+<img src="${doc.photo}" class="doctor-img">
+
+<div>
+
+<h5 class="mt-2">${doc.name}</h5>
+
+<p class="text-muted mb-1">${doc.specialization}</p>
+<p class="text-muted mb-1">${doc.email}</p>
+<p class="text-muted mb-1">${doc.about}</p>
+
+
+<p class="mb-1">Experience : ${doc.experience}</p>
+<p class="mb-1">⭐ Rating : ${doc.rating || "N/A"}</p>
+<p class="mb-1">👥 Patients : ${doc.patients || "0"}</p>
+<p>Fees : ₹${doc.fees}</p>
+
+</div>
+
+<div class="card-buttons">
+<button class="btn btn-warning btn-sm"
+onclick="editDoctor('${doc.id}')">
+Edit Profile
+</button>
+
+<button class="btn btn-dark btn-sm"
+onclick="openSlotManager('${doc.id}','${doc.name}')">
+Manage Slots
+</button>
+
+<button class="btn btn-danger btn-sm"
+onclick="deleteDoctor('${doc.id}')">
+Delete Profile
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+`
+
+})
+}
+
+}loadDoctors()
+
+/* ADD DOCTOR */
+
+document.getElementById("addDoctorBtn").addEventListener("click", async()=>{
+
+let name=document.getElementById("name").value
+let email=document.getElementById("email").value
+let spec=document.getElementById("spec").value
+let exp=document.getElementById("exp").value
+let fees=document.getElementById("fees").value
+let about=document.getElementById("about").value
+let rating = document.getElementById("rating").value;
+let patients = document.getElementById("patients").value;
+let file=document.getElementById("photo").files[0]
+
+if(!name || !email || !spec || !exp || !fees || !about || !file || !rating || !patients){
+
+alert("Fill all fields")
+return
+
+}
+
+
+
+/* IMAGE UPLOAD */
+
+let fileName = Date.now() + "_" + file.name;
+
+let { error: uploadError } = await supabase.storage
+.from("doctors")
+.upload("profiles/" + fileName, file);
+
+if(uploadError){
+console.log(uploadError)
+alert("Image upload failed")
+return
+}
+
+/* GET PUBLIC URL */
+
+let { data:urlData } = supabase.storage
+.from("doctors")
+.getPublicUrl("profiles/" + fileName);
+
+let imageURL = urlData.publicUrl;
+/* INSERT DOCTOR */
+
+let {error}=await supabase
+.from("doctors")
+.insert([{
+name:name,
+email:email,
+specialization:spec,
+experience:exp,
+fees:fees,
+rating: parseFloat(rating),
+patients: parseInt(patients),
+about:about,
+photo:imageURL
+}])
+
+
+if(error){
+
+alert("Doctor add failed")
+console.log(error)
+return
+
+}
+
+alert("Doctor Added Successfully")
+
+location.reload()
+
+})
+/* FETCHING EXISTING DATA OF DOCTORS FOR EDITING */
+
+let doctorId = null;
+
+window.editDoctor = async function(id){
+
+doctorId = id;
+
+showPage("editprofile");
+
+const { data } = await supabase
+.from("doctors")
+.select("*")
+.eq("id", id)
+.single()
+
+document.getElementById("editName").value = data.name
+document.getElementById("editMail").value = data.email
+document.getElementById("editSpec").value = data.specialization
+document.getElementById("editExp").value = data.experience
+document.getElementById("editFees").value = data.fees
+document.getElementById("editabout").value = data.about
+document.getElementById("editRating").value = data.rating || 0;
+document.getElementById("editPatients").value = data.patients || 0;
+document.getElementById("editImg").value = data.photo
+
+}
+
+
+/* UPDATE OR EDIT DOCTOR */
+
+window.updateDoctor = async function(){
+
+const name = document.getElementById("editName").value
+const email = document.getElementById("editMail").value
+const specialization = document.getElementById("editSpec").value
+const experience = document.getElementById("editExp").value
+const fees = document.getElementById("editFees").value
+const rating = document.getElementById("editRating").value;
+const patients = document.getElementById("editPatients").value;
+const about = document.getElementById("editabout").value
+const photo = document.getElementById("editImg").value
+
+const { error } = await supabase
+.from("doctors")
+.update({
+name:name,
+email:email,
+specialization:specialization,
+experience:experience,
+fees:fees,
+rating: parseFloat(rating),
+patients: parseInt(patients),
+about:about,
+photo:photo
+})
+.eq("id", doctorId)
+
+if(error){
+alert("Update failed")
+return
+}
+
+alert("Profile updated successfully")
+
+showPage("doctorList")
+
+loadDoctors()
+
+}
+/* MANAGING SLOTS */
+let currentDoctor = null;
+let slots = [];
+
+/* OPEN SLOT PAGE */
+
+window.openSlotManager = async function(id,name){
+
+    currentDoctor = id;
+    console.log("Current Doctor ID:", currentDoctor);
+
+    showPage("slotsPage");
+
+    document.getElementById("slotDate").min =
+        new Date().toISOString().split("T")[0];
+
+    document.getElementById("slotDoctorName").innerText =
+        "Slots for Dr. " + name;
+
+    const { data, error } = await supabase
+        .from("slots")
+        .select("*")
+        .eq("doctor_id", id);
+
+    slots = data || [];
+
+    normalizeSlots();  // 👈 THIS FIXES THE BUG
+
+    renderSlots();
+}
+
+/* ADD SLOT */
+window.addSlot = function () {
+    const dateInput = document.getElementById("slotDate").value;
+    const timeInput = document.getElementById("slotTime").value;
+
+    if (!dateInput || !timeInput) {
+        alert("Please select date and time");
+        return;
+    }
+
+    // Convert YYYY-MM-DD safely
+    const selectedDate = new Date(dateInput + "T00:00:00");
+
+    // Normalize today's date
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // ❌ Block past dates
+    if (selectedDate.getTime() < today.getTime()) {
+        alert("❌ Invalid Date! Please select a future date.");
+        return;
+    }
+
+    // ❌ Prevent duplicate slot (Both DB + new slots)
+    const duplicate = slots.find(s => {
+        const dbDate = (s.slot_date || s.date);
+        const dbTime = (s.slot_time || s.time);
+        return dbDate === dateInput && dbTime === timeInput;
+    });
+
+    if (duplicate) {
+        alert("❌ This slot already exists!");
+        return;
+    }
+
+    // Push NEW slot
+    slots.push({
+        date: dateInput,
+        time: timeInput
+    });
+
+    renderSlots();
+};
+function normalizeSlots() {
+    slots = slots.map(s => ({
+        id: s.id || null,
+        date: s.slot_date || s.date,
+        time: s.slot_time || s.time
+    }));
+}
+/* SHOW SLOTS */
+
+function renderSlots(){
+
+let container = document.getElementById("slotContainer")
+
+container.innerHTML=""
+
+slots.forEach((slot,index)=>{
+
+let date = slot.slot_date || slot.date
+let time = slot.slot_time || slot.time
+
+container.innerHTML += `
+<span class="slot-pill">
+${date} ${time}
+<span class="removeSlot"
+onclick="deleteSlot('${slot.id || index}')">
+✖
+</span>
+</span>
+`
+
+})
+
+}
+
+/* REMOVE SLOT */
+
+window.deleteSlot = async function(id){
+
+if(!confirm("Delete this slot?")) return
+
+const { error } = await supabase
+.from("slots")
+.delete()
+.eq("id", id)
+
+if(error){
+alert("Delete failed")
+return
+}
+
+alert("Slot deleted")
+
+openSlotManager(currentDoctor,"")
+
+}
+
+/* SAVE SLOTS */
+window.saveSlots = async function () {
+
+    // Only save new slots (old slots already exist in DB)
+    const newSlots = slots.filter(slot => !slot.id);
+
+    if (newSlots.length === 0) {
+        alert("No new slots to save!");
+        return;
+    }
+
+    const insertData = newSlots.map(slot => ({
+        doctor_id: currentDoctor,
+        slot_date: toDBDate(slot.date),
+        slot_time: slot.time
+    }));
+
+    const { error } = await supabase
+        .from("slots")
+        .insert(insertData);
+
+    if (error) {
+        console.log(error);
+        alert("Error saving slots");
+        return;
+    }
+
+    alert("Slots saved successfully!");
+
+    // Reload slots so saved slots get IDs and won't save again
+    openSlotManager(currentDoctor, "");
+};
+
+
+/* DELETE DOCTOR */
+window.deleteDoctor = async function(id){
+
+if(!confirm("Are you sure you want to delete this doctor?")) return
+
+const { error } = await supabase
+.from("doctors")
+.update({ is_deleted: true })
+.eq("id", id)
+
+if(error){
+console.log(error)
+alert("Soft delete failed")
+return
+}
+
+alert("Doctor deleted successfully (soft delete)")
+
+loadDoctors()
+
+}
+
+/* LOAD USERS */
+const userMenu = document.querySelector('.menu[onclick="showPage(\'userListPage\')"]');
+
+userMenu.onclick = () => {
+    showPage("userListPage");
+    loadUsers();
+};
+
+
+/* MENU CLICK PAR LABTEST PAGE LOAD KRANA */
+const labTestMenu = document.querySelector('.menu[onclick="showPage(\'labtestPage\')"]');
+
+labTestMenu.onclick = () => {
+    showPage("labtestPage");
+    loadLabTests();
+};
+
+
+/* LOAD LAB TEST BOOKINGS */
+async function loadLabTests() {
+
+    const container = document.getElementById("labtestContainer");
+    container.innerHTML = "<p>Loading...</p>";
+
+    const { data, error } = await supabase
+        .from("labtestbookings")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        console.log(error);
+        container.innerHTML = "<p>Error loading lab tests</p>";
+        return;
+    }
+
+    container.innerHTML = "";
+
+    data.forEach(test => {
+
+        let status = test.status || "pending";
+
+        container.innerHTML += `
+        <div class="col-md-4 d-flex">
+            <div class="lab-card">
+
+                <div class="lab-title">🧪 ${test.test}</div>
+
+                <p class="lab-info"><strong>Patient:</strong> ${test.name}</p>
+                <p class="lab-info"><strong>Phone:</strong> ${test.phone}</p>
+                <p class="lab-info"><strong>Email:</strong> ${test.email || "N/A"}</p>
+
+                <p class="lab-info"><strong>Preferred Date:</strong> 
+                    ${test.preferreddate 
+                        ? new Date(test.preferreddate).toLocaleDateString() 
+                        : "N/A"}
+                </p>
+
+                <p class="lab-info"><strong>Collection:</strong> ${test.collection_type}</p>
+
+                <p class="lab-info"><strong>Time Slot:</strong> 
+                    ${test.time_slot ? test.time_slot : "No Slot Selected"}
+                </p>
+
+                <p class="lab-info"><strong>Address:</strong> ${test.address || "N/A"}</p>
+
+                <p class="lab-info"><strong>Prescription:</strong><br>
+                    ${
+                        test.prescription
+                            ? `<a href="${test.prescription}" target="_blank" class="prescription-btn">View Prescription</a>`
+                            : "No File Uploaded"
+                    }
+                </p>
+
+                <p class="lab-info">
+                    <strong>Status:</strong>
+                    <span class="badge ${status === "completed" ? "bg-success" : "bg-warning"}">
+                        ${status.toUpperCase()}
+                    </span>
+                </p>
+
+                ${
+                    status === "pending"
+                    ? `
+                        <button class="btn btn-success btn-sm w-100"
+                            onclick="markLabTestCompleted('${test.id}')">
+                            Mark as Completed
+                        </button>
+                    `
+                    : `
+                        <button class="btn btn-danger btn-sm w-100"
+                            onclick="deleteLabTest('${test.id}')">
+                            Delete Lab Test
+                        </button>
+                    `
+                }
+
+                <div class="lab-date mt-2">
+                    <strong>Booked On:</strong> 
+                    ${new Date(test.created_at).toLocaleDateString()}
+                </div>
+
+            </div>
+        </div>
+        `;
+    });
+}
+// MARK LAB TEST COMPLETED
+window.markLabTestCompleted = async function(id) {
+
+    const { error } = await supabase
+        .from("labtestbookings")
+        .update({ status: "completed" })
+        .eq("id", id);
+
+    if (error) {
+        console.log(error);
+        alert("Error updating lab test status");
+        return;
+    }
+
+    alert("Lab Test marked as Completed!");
+    loadLabTests();
+};
+// DELETE LAB TEST
+window.deleteLabTest = async function(id) {
+
+    if (!confirm("Are you sure you want to delete this lab test booking?")) return;
+
+    const { error } = await supabase
+        .from("labtestbookings")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+        console.log(error);
+        alert("Error deleting lab test booking");
+        return;
+    }
+
+    alert("Lab Test booking deleted successfully!");
+    loadLabTests();
+};
+
+// LOAD SERVICE BOOKINGS
+window.loadServiceBookings = async function () {
+
+  const container = document.getElementById("serviceBookingContainer");
+  container.innerHTML = "<p>Loading...</p>";
+
+  const { data, error } = await supabase
+    .from("services")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.log(error);
+    container.innerHTML = "<p class='text-danger'>Error loading service bookings</p>";
+    return;
+  }
+
+  container.innerHTML = "";
+
+  if (data.length === 0) {
+    container.innerHTML = "<p>No bookings found.</p>";
+    return;
+  }
+
+  data.forEach(book => {
+
+    let status = book.status || "confirmed";
+
+    container.innerHTML += `
+      <div class="col-md-4 col-sm-6 col-12 d-flex">
+        <div class="lab-card w-100">
+
+          <div class="lab-title">💳 ${book.service}</div>
+
+          <p class="lab-info"><strong>Name:</strong> ${book.name}</p>
+          <p class="lab-info"><strong>Email:</strong> ${book.email}</p>
+          <p class="lab-info"><strong>Phone:</strong> ${book.phone}</p>
+
+          <p class="lab-info"><strong>Price:</strong> ₹${book.price}</p>
+
+          <p class="lab-info">
+            <strong>Status:</strong>
+            <span class="badge ${status === "confirmed" ? "bg-success" : "bg-warning"}">
+              ${status.toUpperCase()}
+            </span>
+          </p>
+
+          <button class="btn btn-danger btn-sm w-100 mt-2"
+            onclick="deleteServiceBooking('${book.id}')">
+            Delete Booking
+          </button>
+
+          <div class="lab-date mt-3">
+            <strong>Booked On:</strong>
+            ${new Date(book.created_at).toLocaleDateString()}
+          </div>
+
+        </div>
+      </div>
+    `;
+  });
+};
+
+
+// DELETE SERVICE BOOKING
+window.deleteServiceBooking = async function(id) {
+
+  if (!confirm("Are you sure you want to delete this booking?")) return;
+
+  const { error } = await supabase
+    .from("services")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    console.log(error);
+    alert("Delete failed");
+    return;
+  }
+
+  alert("Booking Deleted ✅");
+  loadServiceBookings();
+};
+
+// LOAD TESTIMONIALS
+window.loadTestimonials = async function () {
+    // APPROVE TESTIMONIAL
+window.approveTestimonial = async function(id) {
+
+    const { error } = await supabase
+        .from("testimonials")
+        .update({ status: "approved" })
+        .eq("id", id);
+
+    if (error) {
+        console.log(error);
+        alert("Approve failed");
+        return;
+    }
+
+    alert("Testimonial Approved ✅");
+    loadTestimonials(); // refresh list
+};
+
+
+// DELETE TESTIMONIAL
+window.deleteTestimonial = async function(id) {
+
+    if (!confirm("Delete this testimonial?")) return;
+
+    const { error } = await supabase
+        .from("testimonials")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+        console.log(error);
+        alert("Delete failed");
+        return;
+    }
+
+    alert("Deleted successfully 🗑️");
+    loadTestimonials();
+};
+
+    const container = document.getElementById("testimonialContainer");
+    container.innerHTML = "<p>Loading...</p>";
+
+    const { data, error } = await supabase
+        .from("testimonials")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+    console.log("Testimonials:", data, error);
+
+    if (error) {
+        container.innerHTML = "<p>Error loading testimonials</p>";
+        
+        return;
+    }
+
+    container.innerHTML = "";
+
+    data.forEach(t => {
+
+        let status = t.status || "pending";
+
+        container.innerHTML += `
+        <div class="col-md-4 mb-4">
+            <div class="card p-3">
+
+                <img src="${t.image_url || 'https://via.placeholder.com/150'}" 
+                     style="height:150px; object-fit:cover; border-radius:10px;">
+
+                <h5 class="mt-2">${t.name}</h5>
+                <p>${t.message}</p>
+
+                <p>
+                    <strong>Status:</strong> 
+                    <span class="badge ${status === "approved" ? "bg-success" : "bg-warning"}">
+                        ${status}
+                    </span>
+                </p>
+
+                ${
+                    status === "pending"
+                    ? `<button class="btn btn-success btn-sm w-100"
+                        onclick="approveTestimonial('${t.id}')">
+                        Approve
+                    </button>`
+                    : `<button class="btn btn-danger btn-sm w-100"
+                        onclick="deleteTestimonial('${t.id}')">
+                        Delete
+                    </button>`
+                }
+
+            </div>
+        </div>
+        `;
+    });
+};
+
+ // slot display list js
+
+console.log("✅ loadDoctorSlotsMonthWise function called");
+window.loadDoctorSlotsMonthWise = async function () {
+
+  const container = document.getElementById("doctorSlotListContainer");
+  const monthDropdown = document.getElementById("monthSelect");
+
+  container.innerHTML = "<p>Loading doctor slots...</p>";
+
+  // ✅ Dropdown months generate
+  const now = new Date();
+  const monthsList = [];
+
+  for (let i = 0; i < 12; i++) {
+    const future = new Date(now.getFullYear(), now.getMonth() + i, 1);
+
+    const monthKey = future.toLocaleString("en-US", {
+      month: "long",
+      year: "numeric"
+    });
+
+    monthsList.push({
+      label: monthKey,
+      month: future.getMonth(),
+      year: future.getFullYear()
+    });
+  }
+
+  // ✅ Fill dropdown only once
+  if (monthDropdown.options.length === 0) {
+    monthsList.forEach((m, index) => {
+      const option = document.createElement("option");
+      option.value = `${m.month}-${m.year}`;
+      option.textContent = m.label;
+
+      if (index === 0) option.selected = true;
+
+      monthDropdown.appendChild(option);
+    });
+  }
+
+  // ✅ Selected month-year
+  const [selectedMonth, selectedYear] = monthDropdown.value.split("-");
+  const selectedM = parseInt(selectedMonth);
+  const selectedY = parseInt(selectedYear);
+
+  // 1) Fetch doctors
+  const { data: doctors, error: docError } = await supabase
+    .from("doctors")
+    .select("*")
+    .eq("is_deleted", false);
+
+  if (docError) {
+    console.log(docError);
+    container.innerHTML = "<p class='text-danger'>Error loading doctors</p>";
+    return;
+  }
+
+  // 2) Fetch all slots
+  const { data: slots, error: slotError } = await supabase
+    .from("slots")
+    .select("*")
+    .order("slot_date", { ascending: true });
+
+  if (slotError) {
+    console.log(slotError);
+    container.innerHTML = "<p class='text-danger'>Error loading slots</p>";
+    return;
+  }
+
+  container.innerHTML = "";
+
+  doctors.forEach((doc) => {
+
+    // doctor slots filter
+    let doctorSlots = slots.filter(s => s.doctor_id === doc.id);
+
+    // ✅ Filter slots by selected month + year
+    doctorSlots = doctorSlots.filter(slot => {
+      const dateObj = new Date(slot.slot_date);
+      return (
+        dateObj.getMonth() === selectedM &&
+        dateObj.getFullYear() === selectedY
+      );
+    });
+
+    // ✅ Remove duplicates
+    doctorSlots = doctorSlots.filter((slot, index, arr) => {
+      return index === arr.findIndex(s =>
+        s.doctor_id === slot.doctor_id &&
+        s.slot_date === slot.slot_date &&
+        s.slot_time === slot.slot_time
+      );
+    });
+
+    let monthsHTML = "";
+
+    if (doctorSlots.length === 0) {
+      monthsHTML = `<p class="text-danger mt-2">No slots available</p>`;
+    } else {
+
+      const monthTitle = new Date(selectedY, selectedM, 1).toLocaleString("en-US", {
+        month: "long",
+        year: "numeric"
+      });
+
+      monthsHTML += `<div class="month-title">${monthTitle}</div>`;
+
+      doctorSlots.forEach(slot => {
+        monthsHTML += `
+          <span class="slot-badge">
+            ${slot.slot_date} | ${slot.slot_time}
+          </span>
+        `;
+      });
+    }
+
+    container.innerHTML += `
+      <div class="col-md-6 col-lg-4 mb-4 d-flex">
+        <div class="slot-doctor-card w-100">
+          <h4>${doc.name}</h4>
+          <p>${doc.specialization}</p>
+
+          ${monthsHTML}
+        </div>
+      </div>
+    `;
+  });
+};
+
+
+// ✅ Dropdown onchange event (Only once)
+document.getElementById("monthSelect").addEventListener("change", () => {
+  window.loadDoctorSlotsMonthWise();
+});
+
+
+// LOAD APPOINTMENTS
+window.loadAppointments = async function () {
+
+    const container = document.getElementById("appointmentList");
+    container.innerHTML = "<p>Loading...</p>";
+
+    const { data, error } = await supabase
+        .from("appointments")
+        .select(`
+            *,
+            doctors ( name )
+        `)
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        console.log(error);
+        container.innerHTML = "<p>Error loading appointments</p>";
+        return;
+    }
+
+    container.innerHTML = "";
+
+    data.forEach(app => {
+
+        let status = app.status || "pending";
+
+        container.innerHTML += `
+        <div class="col-md-4 col-sm-6 col-12 d-flex">
+            <div class="lab-card">
+
+                <div class="lab-title">📅 Appointment</div>
+
+                <p class="lab-info"><strong>Patient:</strong> ${app.patientname}</p>
+                <p class="lab-info"><strong>Doctor:</strong> ${app.doctors?.name || "N/A"}</p>
+
+                <p class="lab-info"><strong>Phone:</strong> ${app.phone}</p>
+
+                <p class="lab-info"><strong>Email:</strong> ${app.patientemail}</p>
+
+                <p class="lab-info"><strong>Date:</strong>
+                    ${new Date(app.appointmentdate).toLocaleDateString()}
+                </p>
+
+                <p class="lab-info"><strong>Time:</strong> ${app.appointmenttime}</p>
+
+                <p class="lab-info">
+                    <strong>Status:</strong>
+                    <span class="badge ${status === "completed" ? "bg-success" : "bg-warning"}">
+                        ${status.toUpperCase()}
+                    </span>
+                </p>
+                <p class="lab-info"><strong>Type:</strong> ${app.appointment_type || "offline"}</p>
+
+${
+  app.meet_link 
+  ? `<a href="${app.meet_link}" target="_blank" class="prescription-btn">Join Meet</a>`
+  : ""
+}
+
+                ${
+                    status === "pending" 
+                    ? `
+                    <button class="btn btn-success btn-sm w-100" onclick="markCompleted('${app.id}')">
+                        Mark as Completed
+                    </button>
+                    `
+                    : `
+                    <button class="btn btn-danger btn-sm w-100" onclick="deleteAppointment('${app.id}')">
+                        Delete Appointment
+                    </button>
+                    `
+                }
+
+            </div>
+        </div>
+        `;
+    });
+}
+
+// MARK COMPLETED APPOINTMENTS
+window.markCompleted = async function(id) {
+
+    // 1) Update DB first
+    const { data, error } = await supabase
+        .from("appointments")
+        .update({ status: "completed" })
+        .eq("id", id);
+
+    if (error) {
+        console.log(error);
+        alert("Error updating status");
+        return;
+    }
+
+    // 2) UI ko turant refresh karo
+    loadAppointments();
+};
+// DELETE APPOINTMENTS
+window.deleteAppointment = async function(id) {
+
+    if (!confirm("Are you sure?")) return;
+
+    const { data, error } = await supabase
+        .from("appointments")
+        .delete()
+        .match({ id: id }); // <-- FIX
+
+    console.log("DELETE ERROR:", error);
+
+    if (error) {
+        alert("Supabase delete error — check console");
+        return;
+    }
+
+    alert("Appointment deleted");
+    loadAppointments();
+};
+
+// LOAD BASIC APPOINTMENTS
+window.loadBasicAppointments = async function () {
+
+    const container = document.getElementById("basicAppointmentList");
+    container.innerHTML = "<p>Loading basic appointments...</p>";
+
+    const { data, error } = await supabase
+        .from("basic_appointment")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        console.log(error);
+        container.innerHTML = "<p>Error loading basic appointments</p>";
+        return;
+    }
+
+    container.innerHTML = "";
+
+    if (!data || data.length === 0) {
+        container.innerHTML = "<p>No basic appointments found.</p>";
+        return;
+    }
+
+    data.forEach(app => {
+
+        let status = app.status || "pending";
+
+        let badgeClass = "status-pending";
+        if (status === "confirmed") badgeClass = "status-confirmed";
+        if (status === "completed") badgeClass = "status-completed";
+
+        container.innerHTML += `
+        <div class="col-md-4 col-sm-6 col-12 d-flex">
+            <div class="lab-card">
+
+                <div class="lab-title">📌 Basic Appointment</div>
+
+                <p class="lab-info"><strong>Name:</strong> ${app.name}</p>
+                <p class="lab-info"><strong>Email:</strong> ${app.email}</p>
+                <p class="lab-info"><strong>Phone:</strong> ${app.phone}</p>
+
+                <p class="lab-info"><strong>Appointment Type:</strong> ${app.appointment_type}</p>
+                <p class="lab-info"><strong>Disease:</strong> ${app.disease}</p>
+
+                <p class="lab-info"><strong>Date:</strong> ${app.date}</p>
+                <p class="lab-info"><strong>Time:</strong> ${app.time}</p>
+
+                <p class="lab-info">
+                    <strong>Status:</strong>
+                    <span class="status-badge ${badgeClass}">
+                        ${status.toUpperCase()}
+                    </span>
+                </p>
+
+                ${
+                    status !== "completed"
+                    ? `
+                        <button class="btn btn-success btn-sm w-100 mt-2"
+                            onclick="markBasicAppointmentCompleted('${app.id}')">
+                            Mark as Completed
+                        </button>
+                      `
+                    : `
+                        <button class="btn btn-danger btn-sm w-100 mt-2"
+                            onclick="deleteBasicAppointment('${app.id}')">
+                            Delete Appointment
+                        </button>
+                      `
+                }
+
+                <div class="lab-date mt-3">
+                    <strong>Booked On:</strong>
+                    ${new Date(app.created_at).toLocaleDateString()}
+                </div>
+
+            </div>
+        </div>
+        `;
+    });
+};
+
+// MARK BASIC APPOINTMENT COMPLETED
+window.markBasicAppointmentCompleted = async function(id) {
+
+    const { error } = await supabase
+        .from("basic_appointment")
+        .update({ status: "completed" })
+        .eq("id", id);
+
+    if (error) {
+        console.log(error);
+        alert("Error updating status");
+        return;
+    }
+
+    alert("Basic appointment marked as completed!");
+    loadBasicAppointments();
+};
+
+// DELETE BASIC APPOINTMENT
+window.deleteBasicAppointment = async function(id) {
+
+    if (!confirm("Are you sure you want to delete this basic appointment?")) return;
+
+    const { error } = await supabase
+        .from("basic_appointment")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+        console.log(error);
+        alert("Delete failed");
+        return;
+    }
+
+    alert("Basic appointment deleted successfully!");
+    loadBasicAppointments();
+};
+</script>
+
+
+<script>
+function logoutAdmin(){
+    localStorage.clear();
+    window.location.href = "admin-login.html";
+}
+</script>
+</body>
+
+</html>

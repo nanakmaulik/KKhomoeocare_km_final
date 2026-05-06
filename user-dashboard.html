@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Dashboard | MediSphere</title>
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background: #f4f7fb;
+      font-family: Segoe UI, Arial, sans-serif;
+      margin: 0;
+    }
+
+    .sidebar {
+      width: 240px;
+      height: 100vh;
+      background: #1d2b53;
+      position: fixed;
+      color: white;
+      padding-top: 30px;
+    }
+
+    .sidebar h3 {
+      text-align: center;
+      margin-bottom: 40px;
+      font-weight: 700;
+    }
+
+    .menu {
+      padding: 13px 22px;
+      cursor: pointer;
+      color: #ddd;
+      transition: 0.3s;
+      font-weight: 500;
+    }
+
+    .menu:hover {
+      background: #111d40;
+      color: white;
+    }
+
+    .content {
+      margin-left: 260px;
+      padding: 35px;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .active {
+      display: block;
+    }
+
+    .top-card {
+      background: white;
+      border-radius: 14px;
+      padding: 22px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      margin-bottom: 25px;
+    }
+
+    .dash-card {
+      background: white;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+      height: 100%;
+    }
+
+    .dash-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1d2b53;
+      margin-bottom: 10px;
+    }
+
+    .info-line {
+      font-size: 14px;
+      margin: 5px 0;
+      color: #444;
+    }
+
+    .info-line strong {
+      color: #000;
+    }
+
+    .meet-btn {
+      background: #0066ff;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .meet-btn:hover {
+      background: #004ecc;
+      color: white;
+    }
+
+    .badge-paid {
+      background: #198754;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .badge-pending {
+      background: #ffc107;
+      color: #000;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .logout-btn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      width: 100%;
+      padding: 10px 16px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+
+    .empty-box {
+      background: white;
+      padding: 20px;
+      border-radius: 14px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      color: #666;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="sidebar">
+  <h3>MediSphere</h3>
+
+  <div class="menu" onclick="showPage('appointmentsPage'); loadAppointments();">
+    📅 My Appointments
+  </div>
+
+  <div class="menu" onclick="showPage('labTestsPage'); loadLabTests();">
+    🧪 My Lab Tests
+  </div>
+
+  <div class="menu" onclick="showPage('profilePage');">
+    👤 My Profile
+  </div>
+
+  <div class="menu" onclick="window.location.href='index.html'">
+    🏠 Back to Website
+  </div>
+
+  <div style="padding: 0 20px;">
+    <button class="logout-btn" onclick="logoutUser()">Logout</button>
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="top-card">
+    <h2 id="dashboardTitle">User Dashboard</h2>
+    <p id="userEmail" class="mb-0"></p>
+  </div>
+
+  <!-- APPOINTMENTS PAGE -->
+  <div id="appointmentsPage" class="page active">
+    <h3 class="mb-4">My Confirmed Appointments</h3>
+    <div id="appointmentsBox" class="row g-4">Loading appointments...</div>
+  </div>
+
+  <!-- LAB TEST PAGE -->
+  <div id="labTestsPage" class="page">
+    <h3 class="mb-4">My Lab Test Bookings</h3>
+    <div id="labTestsBox" class="row g-4">Loading lab tests...</div>
+  </div>
+
+  <!-- PROFILE PAGE -->
+  <div id="profilePage" class="page">
+    <h3 class="mb-4">My Profile</h3>
+
+    <div class="top-card">
+      <p><strong>Email:</strong> <span id="profileEmail"></span></p>
+      <p><strong>User ID:</strong> <span id="profileId"></span></p>
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+import { supabase } from "./js/supabase.js";
+
+let currentUser = null;
+
+function showPage(id) {
+  document.querySelectorAll(".page").forEach(page => {
+    page.classList.remove("active");
+  });
+
+  document.getElementById(id).classList.add("active");
+}
+
+window.showPage = showPage;
+
+async function checkLogin() {
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session) {
+    alert("Please login first to view your dashboard.");
+    window.location.href = "signin.html";
+    return;
+  }
+
+  currentUser = session.user;
+
+  document.getElementById("dashboardTitle").innerText = "Welcome to Your Dashboard";
+  document.getElementById("userEmail").innerText = "Logged in as: " + currentUser.email;
+
+  document.getElementById("profileEmail").innerText = currentUser.email;
+  document.getElementById("profileId").innerText = currentUser.id;
+
+  loadAppointments();
+}
+
+async function loadAppointments() {
+  const box = document.getElementById("appointmentsBox");
+  box.innerHTML = "<p>Loading appointments...</p>";
+
+  const { data, error } = await supabase
+    .from("appointments")
+    .select(`
+      *,
+      doctors (
+        name,
+        specialization,
+        fees
+      )
+    `)
+    .eq("patientemail", currentUser.email)
+    .eq("status", "confirmed")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.log("Appointment load error:", error);
+    box.innerHTML = `<div class="empty-box">Error loading appointments.</div>`;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    box.innerHTML = `
+      <div class="empty-box">
+        No confirmed appointments found.
+      </div>
+    `;
+    return;
+  }
+
+  box.innerHTML = "";
+
+  data.forEach(app => {
+    const paymentStatus = app.payment_status || "pending";
+
+    box.innerHTML += `
+      <div class="col-md-4 col-sm-6 col-12 d-flex">
+        <div class="dash-card">
+
+          <div class="dash-title">📅 Appointment</div>
+
+          <p class="info-line"><strong>Doctor:</strong> ${app.doctors?.name || "N/A"}</p>
+          <p class="info-line"><strong>Specialization:</strong> ${app.doctors?.specialization || "N/A"}</p>
+          <p class="info-line"><strong>Date:</strong> ${app.appointmentdate}</p>
+          <p class="info-line"><strong>Time:</strong> ${app.appointmenttime}</p>
+          <p class="info-line"><strong>Type:</strong> ${app.appointment_type || "offline"}</p>
+          <p class="info-line"><strong>Status:</strong> ${app.status || "confirmed"}</p>
+
+          <p class="info-line">
+            <strong>Payment:</strong>
+            <span class="${paymentStatus === "paid" ? "badge-paid" : "badge-pending"}">
+              ${paymentStatus.toUpperCase()}
+            </span>
+          </p>
+
+          ${
+            app.meet_link
+              ? `<a href="${app.meet_link}" target="_blank" class="meet-btn">Join Meet</a>`
+              : ""
+          }
+
+        </div>
+      </div>
+    `;
+  });
+}
+
+// async function loadLabTests() {
+//   const box = document.getElementById("labTestsBox");
+//   box.innerHTML = "<p>Loading lab tests...</p>";
+
+//   const { data, error } = await supabase
+//     .from("labtestbookings")
+//     .select("*")
+//     .eq("email", currentUser.email.trim().toLowerCase())
+//         .order("created_at", { ascending: false });
+
+//   if (error) {
+//     console.log("Lab test load error:", error);
+//     box.innerHTML = `<div class="empty-box">Error loading lab tests.</div>`;
+//     return;
+//   }
+
+//   if (!data || data.length === 0) {
+//     box.innerHTML = `
+//       <div class="empty-box">
+//         No lab test bookings found.
+//       </div>
+//     `;
+//     return;
+//   }
+
+//   box.innerHTML = "";
+
+//   data.forEach(test => {
+//     box.innerHTML += `
+//       <div class="col-md-4 col-sm-6 col-12 d-flex">
+//         <div class="dash-card">
+
+//           <div class="dash-title">🧪 ${test.test}</div>
+
+//           <p class="info-line"><strong>Date:</strong> ${test.preferreddate || "N/A"}</p>
+//           <p class="info-line"><strong>Collection:</strong> ${test.collection_type || "N/A"}</p>
+//           <p class="info-line"><strong>Time Slot:</strong> ${test.time_slot || "N/A"}</p>
+//           <p class="info-line"><strong>Status:</strong> ${test.status || "pending"}</p>
+
+//         </div>
+//       </div>
+//     `;
+//   });
+// }
+async function loadLabTests() {
+  const box = document.getElementById("labTestsBox");
+  box.innerHTML = "<p>Loading lab tests...</p>";
+
+  const userEmail = currentUser.email.trim().toLowerCase();
+
+  console.log("LOGGED IN USER EMAIL:", userEmail);
+
+  const { data, error } = await supabase
+    .from("labtestbookings")
+    .select("*")
+    .ilike("email", userEmail)
+    .order("created_at", { ascending: false });
+
+  console.log("LAB TEST DATA:", data);
+  console.log("LAB TEST ERROR:", error);
+
+  if (error) {
+    console.log("Lab test load error:", error);
+    box.innerHTML = `<div class="empty-box">Error loading lab tests.</div>`;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    box.innerHTML = `
+      <div class="empty-box">
+        No lab test bookings found for ${userEmail}.
+      </div>
+    `;
+    return;
+  }
+
+  box.innerHTML = "";
+
+  data.forEach(test => {
+    box.innerHTML += `
+      <div class="col-md-4 col-sm-6 col-12 d-flex">
+        <div class="dash-card">
+
+          <div class="dash-title">🧪 ${test.test || "Lab Test"}</div>
+
+          <p class="info-line"><strong>Name:</strong> ${test.name || "N/A"}</p>
+          <p class="info-line"><strong>Email:</strong> ${test.email || "N/A"}</p>
+          <p class="info-line"><strong>Phone:</strong> ${test.phone || "N/A"}</p>
+          <p class="info-line"><strong>Date:</strong> ${test.preferreddate || "N/A"}</p>
+          <p class="info-line"><strong>Collection:</strong> ${test.collection_type || "N/A"}</p>
+          <p class="info-line"><strong>Time Slot:</strong> ${test.time_slot || "N/A"}</p>
+          <p class="info-line"><strong>Status:</strong> ${test.status || "pending"}</p>
+
+        </div>
+      </div>
+    `;
+  });
+}
+
+window.loadAppointments = loadAppointments;
+window.loadLabTests = loadLabTests;
+
+window.logoutUser = async function () {
+  await supabase.auth.signOut();
+  localStorage.clear();
+  sessionStorage.clear();
+  window.location.href = "signin.html";
+};
+
+checkLogin();
+</script>
+
+</body>
+</html>

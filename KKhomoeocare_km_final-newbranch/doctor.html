@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Doctors – MediSphere</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="favicon.png" rel="icon">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    <style>
+        .doctor-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            background: #fff;
+            transition: 0.3s;
+        }
+        .doctor-card:hover {
+            box-shadow: 0 0 15px rgba(0,0,0,0.15);
+        }
+        .doctor-img {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .doctor-btn {
+            background: #f6e6f5;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            width: 100%;
+        }
+        .nav-item .dropdown-menu {
+    min-width: 150px;
+    padding: 10px 0;
+}
+
+.nav-item .dropdown-menu a {
+    font-size: 15px;
+    padding: 10px 20px;
+}
+
+.nav-item .dropdown-menu a:hover {
+    background: #eef4ff;
+    color: #0d6efd;
+}</style>
+    
+</head>
+
+<body>
+
+   <!-- Topbar Start -->
+<div class="container-fluid py-2 border-bottom d-none d-lg-block">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 text-center text-lg-start mb-2 mb-lg-0">
+                <div class="d-inline-flex align-items-center">
+                    <a class="text-decoration-none text-body pe-3" href=""><i class="bi bi-telephone me-2"></i>+91 62830 87875</a>
+                    <span class="text-body">|</span>
+                    <a class="text-decoration-none text-body px-3" href=""><i class="bi bi-envelope me-2"></i>medisphere@gmail.com</a>
+                </div>
+            </div>
+            <div class="col-md-6 text-center text-lg-end">
+                <div class="d-inline-flex align-items-center">
+                    <a class="text-body px-2" href="https://www.Instagram.com/kk_homoeo_care_">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Topbar End -->
+
+
+<!-- Navbar Start -->
+<div class="container-fluid sticky-top bg-white shadow-sm">
+    <div class="container">
+        <nav class="navbar navbar-expand-lg bg-white navbar-light py-3 py-lg-0">
+            <a href="index.html" class="navbar-brand">
+                <h1 class="m-0 text-uppercase text-primary"><i class="fa fa-clinic-medical me-2"></i>MEDI SPHERE</h1>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                
+                <div class="navbar-nav ms-auto py-0">
+                    <a href="index.html" class="nav-item nav-link ">Home</a>
+                    <a href="about.html" class="nav-item nav-link">About</a>
+                    <a href="price.html" class="nav-item nav-link">Pricing</a>
+                    <a href="contact.html" class="nav-item nav-link">Contact</a>
+                    <a href="testimonial.html" class="nav-item nav-link ">Testimonial</a>
+                    <a href="labtest.html" class="nav-item nav-link">Lab Test</a>
+                    <a href="doctor.html" class="nav-item nav-link active">Find Specialist</a>
+
+                    <!-- ⭐ USER ACCOUNT DROPDOWN ADDED HERE -->
+                    <li class="nav-item dropdown ms-3">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <img src="https://cdn-icons-png.flaticon.com/512/747/747376.png" 
+                                 style="width:32px; height:32px; border-radius:50%; border:2px solid #ddd; padding:2px;">
+                        </a>
+
+                        <div class="dropdown-menu dropdown-menu-end rounded shadow-sm">
+                            <a href="signin.html" class="dropdown-item">Sign In</a>
+                            <a href="signup.html" class="dropdown-item">Sign Up</a>
+                        </div>
+                    </li>
+                </div>
+            </div>
+        </nav>
+    </div>
+</div>
+<!-- Navbar End -->
+ <!-- Doctor List Section -->
+<div class="container py-5">
+ <h2 class="text-center text-primary mb-4">Find a Specialist</h2>
+<div class="row g-4" id="doctorList">
+
+ <!-- Doctor Card 1 -->
+          
+<script type="module">
+
+import { supabase } from "./js/supabase.js";
+
+const list = document.getElementById("doctorList");
+
+
+async function loadDoctors(){
+
+const { data, error } = await supabase
+.from("doctors")
+.select("*")
+.eq("is_deleted", false)
+
+if(error){
+console.log(error)
+return
+}
+
+list.innerHTML="";
+
+data.forEach(d=>{
+
+list.innerHTML += `
+<div class="col-lg-4 col-md-6">
+<div class="doctor-card">
+
+<img src="${d.photo}" class="doctor-img mb-3">
+
+<h4>${d.name}</h4>
+
+<p class="text-muted">${d.specialization}</p>
+
+<p><i class="bi bi-envelope"></i> ${d.email}</p>
+
+<p><i class="bi bi-briefcase"></i> ${d.experience} Years Experience</p>
+
+<p><i class="bi bi-cash"></i> ₹${d.fees} Fees</p>
+<a href="bookappointment.html?doctor=${d.id}" 
+class="doctor-btn mt-2 d-block text-center">
+Book Appointment
+</a>
+
+</div>
+</div>
+`;
+
+});
+
+}
+
+loadDoctors();
+</script>
+
+
+
+
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+   <div class="container-fluid bg-dark text-light mt-5 py-5">
+        <div class="container py-5">
+            <div class="row g-5">
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="d-inline-block text-primary text-uppercase border-bottom border-5 border-secondary mb-4">Get In Touch</h4>
+                    <p class="mb-4">You can get in touch with us at our all online platforms like Whatsapp , Instagram , facebook, Linked in, twitter and mainly on our website chat box too.</p>
+                    <!-- <p class="mb-2"><i class="fa fa-map-marker-alt text-primary me-3"></i>123 Street, New York, USA</p> -->
+                    <p class="mb-2"><i class="fa fa-envelope text-primary me-3"></i>medispere@gmail.com</p>
+                    <p class="mb-0"><i class="fa fa-phone-alt text-primary me-3"></i>+91 62830 87875</p>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="d-inline-block text-primary text-uppercase border-bottom border-5 border-secondary mb-4">Quick Links</h4>
+                    <div class="d-flex flex-column justify-content-start">
+                        <a class="text-light mb-2" href="index.html"><i class="fa fa-angle-right me-2"></i>Home</a>
+                        <a class="text-light mb-2" href="about.html"><i class="fa fa-angle-right me-2"></i>About Us</a>
+                        <a class="text-light mb-2" href="price.html"><i class="fa fa-angle-right me-2"></i>Our Services</a>
+                        <!-- <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Meet The Team</a>
+                        <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Latest Blog</a> -->
+                        <a class="text-light" href="contact.html"><i class="fa fa-angle-right me-2"></i>Contact Us</a>
+                    </div>
+                </div>
+                <!-- <div class="col-lg-3 col-md-6">
+                    <h4 class="d-inline-block text-primary text-uppercase border-bottom border-5 border-secondary mb-4">Popular Links</h4>
+                    <div class="d-flex flex-column justify-content-start">
+                        <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Home</a>
+                        <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>About Us</a>
+                        <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Our Services</a>
+                        <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Meet The Team</a>
+                        <a class="text-light mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Latest Blog</a>
+                        <a class="text-light" href="#"><i class="fa fa-angle-right me-2"></i>Contact Us</a>
+                    </div>
+                </div> -->
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="d-inline-block text-primary text-uppercase border-bottom border-5 border-secondary mb-4">Newsletter</h4>
+                  <form action="https://formspree.io/f/mkokogvy" method="POST">
+    <input type="hidden" name="_subject" value="New Newsletter Subscriber">
+    <input type="hidden" name="_next" value="thankyou.html">
+
+    <div class="input-group">
+        <input type="email" name="email" class="form-control p-3 border-0"
+            placeholder="Your Email Address" required>
+        <button type="submit" class="btn btn-primary">Sign Up</button>
+    </div>
+</form>
+                   <!-- <h6 class="text-primary text-uppercase mt-4 mb-3">Follow Us</h6>
+                    <div class="d-flex">
+                         <a class="btn btn-lg btn-primary btn-lg-square rounded-circle me-2" href="#"><i class="fab fa-twitter"></i></a>
+                        <a class="btn btn-lg btn-primary btn-lg-square rounded-circle me-2" href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-lg btn-primary btn-lg-square rounded-circle me-2" href="#"><i class="fab fa-linkedin-in"></i></a> 
+                        <a class="btn btn-lg btn-primary btn-lg-square rounded-circle" href="https://www.Instagram.com/kk_homoeo_care_"><i class="fab fa-instagram"></i></a>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid bg-dark text-light border-top border-secondary py-4">
+        <div class="container">
+            <div class="row g-5">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-md-0">&copy; <a class="text-primary" href="#">Medi Sphere</a>. All Rights Reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0">Designed by <a class="text-primary" href="kkcoders.co">kkcoders</a></p>
+                </div>
+            </div>
+        </div>
+        <!-- Footer End -->
+
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+ <!-- isse doctor ki id url m pass ho jayegi -->
+<script>
+window.bookAppointment = function(id){
+    window.location.href = "book-appointment.html?doctor=" + id;
+}
+</script>
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="lib/easing/easing.min.js"></script>
+    <script src="lib/waypoints/waypoints.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="lib/tempusdominus/js/moment.min.js"></script>
+    <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
+    <script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+
+    <!-- Template Javascript -->
+    <script src="js/main.js"></script>
+    
+
+</body>
+</html>
+

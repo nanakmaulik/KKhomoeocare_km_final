@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Register as Doctor</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    font-family: "Inter", sans-serif;
+}
+
+/* LEFT SIDE (BRANDING) */
+.left-panel {
+    width: 45%;
+    background: linear-gradient(135deg, #2879ff, #1c5ec9);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px;
+}
+
+.left-panel h1 {
+    font-size: 36px;
+    font-weight: 700;
+}
+
+.left-panel p {
+    margin-top: 15px;
+    font-size: 15px;
+    opacity: 0.9;
+}
+
+/* RIGHT SIDE (FORM) */
+.right-panel {
+    width: 55%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f5f7fb;
+}
+
+/* CARD */
+.card-pro {
+    width: 420px;
+    padding: 35px;
+    border-radius: 16px;
+    background: white;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+}
+
+/* HEADER */
+.card-pro h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    font-size: 13px;
+    color: #6c7a89;
+    margin-bottom: 20px;
+}
+
+/* INPUT */
+.form-control-pro {
+    width: 100%;
+    height: 44px;
+    border-radius: 8px;
+    border: 1.5px solid #d6dde8;
+    background: #f9fbff;
+    padding: 0 12px;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.form-control-pro:focus {
+    border-color: #2879ff;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(40,121,255,0.15);
+    outline: none;
+}
+
+textarea.form-control-pro {
+    height: 70px;
+    padding-top: 8px;
+}
+
+/* BUTTON */
+.btn-pro {
+    width: 100%;
+    height: 45px;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #2879ff, #1c5ec9);
+    color: white;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+.btn-pro:hover {
+    opacity: 0.9;
+}
+
+/* PASSWORD ICON */
+.eye-btn {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    cursor: pointer;
+}
+
+/* MESSAGE */
+#msg {
+    text-align: center;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+/* LINK */
+.link-pro a {
+    color: #2879ff;
+    text-decoration: none;
+}
+
+.link-pro a:hover {
+    text-decoration: underline;
+}
+
+/* MOBILE FIX */
+@media(max-width: 900px){
+    .left-panel {
+        display: none;
+    }
+    .right-panel {
+        width: 100%;
+    }
+}
+
+
+</style>
+</head>
+
+<body>
+
+<!-- LEFT SIDE -->
+<div class="left-panel">
+    <h1>Join Our Healthcare Network</h1>
+    <p>Register as a doctor and start managing appointments, patients, and consultations efficiently.</p>
+</div>
+
+<!-- RIGHT SIDE -->
+<div class="right-panel">
+
+    <div class="card-pro">
+
+        <h2>Register as a Doctor</h2>
+        <div class="subtitle">Your account will be activated after admin approval</div>
+
+        <form id="adminRegisterForm">
+
+            <input type="text" id="name" class="form-control-pro" placeholder="Full Name" required>
+
+            <input type="email" id="email" class="form-control-pro" placeholder="Email Address" required>
+
+            <input type="text" id="specialization" class="form-control-pro" placeholder="Specialization" required>
+
+            <input type="text" id="experience" class="form-control-pro" placeholder="Experience (e.g. 5 years)" required>
+
+            <input type="number" id="fees" class="form-control-pro" placeholder="Consultation Fees" required>
+
+            <textarea id="about" class="form-control-pro" placeholder="About yourself"></textarea>
+           <input type="file" id="image" class="form-control-pro" accept="image/*" required>
+
+            <div style="position:relative;">
+                <input type="password" id="password" class="form-control-pro" placeholder="Password" required>
+                <span class="eye-btn" onclick="togglePassword('password')">👁️</span>
+            </div>
+
+            <div style="position:relative;">
+                <input type="password" id="confirmPassword" class="form-control-pro" placeholder="Confirm Password" required>
+                <span class="eye-btn" onclick="togglePassword('confirmPassword')">👁️</span>
+            </div>
+
+            <p id="msg"></p>
+
+            <button class="btn-pro" type="submit">Register</button>
+
+            <div class="link-pro text-center mt-3">
+                Already have an account? <a href="admin-login.html">Login</a>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const { createClient } = supabase;
+
+const client = createClient(
+    "https://vwvskyxthnwscelhxvma.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ3dnNreXh0aG53c2NlbGh4dm1hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1Njk4MjQsImV4cCI6MjA4NzE0NTgyNH0.uwcDR2hTCy_17nCn4i_B7pe3L8LsdQd8pjupJpkxl9g" // ← put your real key
+);
+
+function togglePassword(id){
+    const field = document.getElementById(id);
+    field.type = field.type === "password" ? "text" : "password";
+}
+
+document.getElementById("adminRegisterForm").addEventListener("submit", async (e)=>{
+    e.preventDefault();
+
+    const msg = document.getElementById("msg");
+
+const nameVal = document.getElementById("name").value.trim();
+const emailVal = document.getElementById("email").value.trim();
+const passVal = document.getElementById("password").value.trim();
+const confirmVal = document.getElementById("confirmPassword").value.trim();
+const specializationVal = document.getElementById("specialization").value.trim();
+const experienceVal = document.getElementById("experience").value.trim();
+const feesVal = document.getElementById("fees").value.trim();
+const aboutVal = document.getElementById("about").value.trim();
+
+
+    if(passVal !== confirmVal){
+        msg.style.color = "red";
+        msg.textContent = "Passwords do not match!";
+        return;
+    }
+
+    msg.style.color = "#2879ff";
+    msg.textContent = "Registering...";
+
+    // 🔥 STEP 1: AUTH SIGNUP
+    const { data, error } = await client.auth.signUp({
+        email: emailVal,
+        password: passVal
+    });
+
+    if(error){
+        msg.style.color = "red";
+        msg.textContent = error.message;
+        return;
+    }
+   
+
+// ⭐ STEP 2: IMAGE UPLOAD (SAFE VERSION)
+
+const imageFile = document.getElementById("image").files[0];
+
+if (!imageFile) {
+    msg.style.color = "red";
+    msg.textContent = "Please upload an image!";
+    return;
+}
+
+const fileName = `${Date.now()}_${imageFile.name}`;
+
+// Upload image to bucket
+const { error: uploadError } = await client.storage
+    .from("doctors")
+    .upload(fileName, imageFile);
+
+if (uploadError) {
+    msg.style.color = "red";
+    msg.textContent = uploadError.message;
+    return;
+}
+
+// Generate Public URL
+const { data: urlData } = client.storage
+    .from("doctors")
+    .getPublicUrl(fileName);
+
+const imageUrl = urlData.publicUrl;
+
+    // 🔥 STEP 2: SAVE DATA
+    const { error: dbError } = await client
+        .from("doctor_requests")
+        .insert([{
+            name: nameVal,
+            email: emailVal,
+            specialization: specializationVal,
+            experience: experienceVal,
+            fees: feesVal,
+            about: aboutVal,
+            photo: imageUrl,
+            auth_user_id: data.user.id,
+            status: "pending"
+        }]);
+
+    if(dbError){
+        msg.style.color = "red";
+        msg.textContent = dbError.message;
+        return;
+    }
+    
+
+    // ✅ SUCCESS
+   showPopup();
+});
+</script>
+
+</body>
+<div id="popup" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+">
+    <div style="
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        text-align: center;
+        width: 320px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    ">
+        <h4 style="margin-bottom:10px;">Registration Submitted</h4>
+        <p style="font-size:14px; color:#555;">
+            Please wait for admin approval before logging in.
+        </p>
+        <button onclick="closePopup()" style="
+            margin-top:15px;
+            padding:8px 20px;
+            border:none;
+            border-radius:8px;
+            background:#2879ff;
+            color:white;
+        ">OK</button>
+    </div>
+</div>
+<script>function showPopup(){
+    const popup = document.getElementById("popup");
+    popup.style.display = "flex";
+
+    // ⏳ Redirect after 2 seconds
+    setTimeout(() => {
+        window.location.href = "index.html";
+    }, 2000);
+}</script>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediSphere – Sign Up</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #e9f0ff 0%, #f6f9ff 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wrapper {
+            width: 430px;
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            background: rgba(255, 255, 255, 0.75);
+            padding: 40px 35px;
+            border-radius: 22px;
+            box-shadow: 0 12px 45px rgba(28, 90, 170, 0.20);
+            border: 1px solid rgba(255, 255, 255, 0.55);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #184a9e;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 28px;
+            color: #5b6b84;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            font-size: 14px;
+            color: #1e335a;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 13px 15px;
+            border-radius: 14px;
+            margin-top: 7px;
+            border: 1.6px solid #cdd6ea;
+            background: rgba(255, 255, 255, 0.85);
+            font-size: 15px;
+            outline: none;
+            transition: 0.25s;
+        }
+
+        .input-group input:focus {
+            border-color: #2764e3;
+            box-shadow: 0 0 0 4px rgba(39, 100, 227, 0.18);
+            background: #ffffff;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #2764e3, #1b4cb7);
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            cursor: pointer;
+            color: white;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(39, 100, 227, 0.32);
+        }
+
+        .bottom-text {
+            margin-top: 22px;
+            text-align: center;
+            font-size: 14px;
+            color: #5c6d89;
+        }
+
+        .bottom-text a {
+            color: #1e57d8;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .bottom-text a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <div class="logo">MediSphere</div>
+        <div class="subtitle">Create your account & access top doctors instantly</div>
+
+        <div class="input-group">
+            <label>Full Name</label>
+            <input type="text" id="name" placeholder="Your full name">
+        </div>
+
+        <div class="input-group">
+            <label>Email Address</label>
+            <input type="email" id="email" placeholder="you@example.com">
+        </div>
+
+        <div class="input-group">
+            <label>Phone Number</label>
+            <input type="text" id="phone" placeholder="+91 98765 43210">
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Create a strong password">
+        </div>
+
+        <button class="btn" onclick="signup()">Create Account</button>
+
+        <div class="bottom-text">
+            Already have an account? <a href="signin.html">Sign In</a>
+        </div>
+    </div>
+
+    <!-- <script>
+        function signup() {
+            let name = document.getElementById("name").value;
+            let email = document.getElementById("email").value;
+            let phone = document.getElementById("phone").value;
+            let password = document.getElementById("password").value;
+
+            if (!name || !email || !phone || !password) {
+                alert("Please fill all fields");
+                return;
+            }
+
+            alert("Account Created Successfully!");
+        }
+    </script> -->
+<script type="module">
+import { supabase } from "./js/supabase.js";
+
+async function signup() {
+    let name = document.getElementById("name").value;
+    let email = document.getElementById("email").value;
+    let phone = document.getElementById("phone").value;
+    let password = document.getElementById("password").value;
+
+    if (!name || !email || !phone || !password) {
+        alert("Please fill all fields");
+        return;
+    }
+
+    // 1️⃣ Create user in Supabase Auth
+    const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+    });
+
+    if (error) {
+        alert("Sign Up Failed: " + error.message);
+        return;
+    }
+
+    const user = data.user;
+
+    // 2️⃣ Insert extra data into public users table
+    const { error: insertError } = await supabase
+        .from("users")
+        .insert([
+            {
+                id: user.id,   // ⭐ VERY IMPORTANT
+                name: name,
+                email: email,
+                phone: phone
+            }
+        ]);
+
+    if (insertError) {
+        alert("Profile Save Failed: " + insertError.message);
+        return;
+    }
+
+    alert("Account Created Successfully! Please verify your email.");
+    window.location.href = "signin.html";
+}
+
+window.signup = signup;
+</script>
+</body>
+</html>

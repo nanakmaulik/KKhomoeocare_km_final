@@ -1,0 +1,6 @@
+.env
+backend/credentials.json
+backend/token.json
+backend/token.js
+node_modules
+.DS_Store
