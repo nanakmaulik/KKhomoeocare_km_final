@@ -963,8 +963,10 @@ app.post("/verify-package-payment", async (req, res) => {
 /******************************
  * START SERVER
  ******************************/
+// Server start hone ke baad ye add karo temporarily
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT} 🚀`);
+  console.log("BREVO KEY CHECK:", process.env.BREVO_API_KEY ? process.env.BREVO_API_KEY.substring(0, 20) + "..." : "NOT FOUND");
 });
