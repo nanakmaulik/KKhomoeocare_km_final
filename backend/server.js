@@ -421,7 +421,8 @@ app.post("/send-approval-email", async (req, res) => {
 
     sendEmail({
       from: `"MediSphere" <${process.env.EMAIL_USER}>`,
-      to: email,
+      to: [email].filter(Boolean),
+
       subject: "Doctor Account Approved 🎉",
       html: `
         <div style="font-family: Arial; padding:20px;">
@@ -463,7 +464,8 @@ app.post("/send-labtest-email", async (req, res) => {
 
     await sendEmail({
       from: `"MediSphere" <${process.env.EMAIL_USER}>`,
-      to: email,
+      to: [email].filter(Boolean),
+
       subject: "Lab Test Booking Confirmation 🧪",
       html: `
         <h2>Lab Test Booked Successfully</h2>
@@ -920,7 +922,8 @@ app.post("/verify-package-payment", async (req, res) => {
 
     sendEmail({
       from: `"MediSphere" <${process.env.EMAIL_USER}>`,
-      to: payment.patientemail,
+      to: [payment.patientemail].filter(Boolean),
+
       subject: "Package Payment Confirmed ✅",
       html: `
         <div style="font-family: Arial; padding:20px;">
