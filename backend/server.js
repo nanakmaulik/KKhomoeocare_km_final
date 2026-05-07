@@ -339,22 +339,22 @@ app.post("/book-online-appointment", async (req, res) => {
       appointmenttime
     );
 
-    const { error } = await supabase.from("appointments").insert([
-      {
-        patientname,
-        patientemail: email,
-        phone,
-        appointmentdate,
-        appointmenttime,
-        doctor_id,
-        slot_id,
-        appointment_type: "online",
-        meet_link: meetLink,
-        status: "confirmed"
-      }
-    ]);
+    // const { error } = await supabase.from("appointments").insert([
+    //   {
+    //     patientname,
+    //     patientemail: email,
+    //     phone,
+    //     appointmentdate,
+    //     appointmenttime,
+    //     doctor_id,
+    //     slot_id,
+    //     appointment_type: "online",
+    //     meet_link: meetLink,
+    //     status: "confirmed"
+    //   }
+    // ]);
 
-    if (error) throw error;
+    // if (error) throw error;
 
     await supabase
       .from("slots")
@@ -622,7 +622,15 @@ app.post("/verify-payment", async (req, res) => {
 if (updateError) {
   throw updateError;
 }
+const { data: doctor, error: doctorFetchError } = await supabase
+  .from("doctors")
+  .select("name, email")
+  .eq("id", payment.doctor_id)
+  .single();
 
+if (doctorFetchError) {
+  console.error("Doctor fetch error:", doctorFetchError);
+}
    
     await supabase
       .from("slots")
