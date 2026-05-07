@@ -13,7 +13,6 @@ import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-
 import { authenticate } from "@google-cloud/local-auth";
 import { google } from "googleapis";
 
@@ -30,8 +29,8 @@ const BACKEND_URL =
   process.env.BACKEND_URL || "https://kkhomoeocare-km-final-1.onrender.com";
 
 /******************************
- * EXPRESS SETUP
- ******************************/
+ * EXPRESS SETUPhhhi
+ ******************************/ 
 const app = express();
 const corsOptions = {
   origin: [
