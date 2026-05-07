@@ -662,7 +662,7 @@ if (doctorFetchError) {
 
       sendEmail({
         from: `"MediSphere" <${process.env.EMAIL_USER}>`,
-        to: `${payment.patientemail},${doctor?.email || ""}`,
+        to: [payment.patientemail, doctor?.email].filter(Boolean),
         subject: "Appointment & Payment Confirmed ✅",
         html: `
           <h2>Your Appointment is Confirmed</h2>
