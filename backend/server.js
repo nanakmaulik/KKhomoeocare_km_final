@@ -618,36 +618,37 @@ app.post("/verify-payment", async (req, res) => {
       .update({ is_booked: true })
       .eq("id", payment.slot_id);
 
-      try {
-        await transporter.sendMail({
-          from: `"MediSphere" <${process.env.EMAIL_USER}>`,
-          to: `${payment.email},${doctor?.email || ""}`,
-          subject: "Appointment & Payment Confirmed ✅",
-          html: `
-            <h2>Your Appointment is Confirmed</h2>
-            <p><strong>Payment:</strong> Confirmed</p>
-            <p><strong>Patient:</strong> ${payment.patientname}</p>
-            <p><strong>Doctor:</strong> ${doctor?.name || "Doctor"}</p>
-            <p><strong>Date:</strong> ${payment.appointmentdate}</p>
-            <p><strong>Time:</strong> ${payment.appointmenttime}</p>
-            <p><strong>Type:</strong> ${payment.appointmentType}</p>
-            ${
-              meetLink
-                ? `<p><strong>Meet Link:</strong> <a href="${meetLink}">${meetLink}</a></p>`
-                : ""
-            }
-          `
-        });
-      
+      transporter.sendMail({
+        from: `"MediSphere" <${process.env.EMAIL_USER}>`,
+        to: `${payment.email},${doctor?.email || ""}`,
+        subject: "Appointment & Payment Confirmed ✅",
+        html: `
+          <h2>Your Appointment is Confirmed</h2>
+          <p><strong>Payment:</strong> Confirmed</p>
+          <p><strong>Patient:</strong> ${payment.patientname}</p>
+          <p><strong>Doctor:</strong> ${doctor?.name || "Doctor"}</p>
+          <p><strong>Date:</strong> ${payment.appointmentdate}</p>
+          <p><strong>Time:</strong> ${payment.appointmenttime}</p>
+          <p><strong>Type:</strong> ${payment.appointmentType}</p>
+          ${
+            meetLink
+              ? `<p><strong>Meet Link:</strong> <a href="${meetLink}">${meetLink}</a></p>`
+              : ""
+          }
+        `
+      })
+      .then(() => {
         console.log("Payment confirmation email sent successfully");
-      } catch (emailErr) {
+      })
+      .catch((emailErr) => {
         console.error("Payment email failed, but appointment is confirmed:", emailErr.message);
-      }
+      });
 
     delete global.paymentStore[order_id];
 
-    res.json({
+    return res.json({
       success: true,
+      message: "Payment verified and appointment confirmed",
       meetLink
     });
   } catch (err) {
@@ -783,33 +784,29 @@ app.post("/verify-package-payment", async (req, res) => {
       });
     }
 
-    try {
-      await transporter.sendMail({
-        from: `"MediSphere" <${process.env.EMAIL_USER}>`,
-        to: payment.email,
-        subject: "Package Payment Confirmed ✅",
-        html: `
-          <div style="font-family: Arial; padding:20px;">
-            <h2>Package Payment Confirmed ✅</h2>
-
-            <p><strong>Name:</strong> ${payment.name}</p>
-            <p><strong>Email:</strong> ${payment.email}</p>
-            <p><strong>Phone:</strong> ${payment.phone}</p>
-            <p><strong>Package:</strong> ${payment.packageName}</p>
-            <p><strong>Amount Paid:</strong> ₹${payment.amount}</p>
-            <p><strong>Payment Status:</strong> Confirmed</p>
-
-            <p>Our team will contact you soon for the next steps.</p>
-
-            <p>Thank you for choosing MediSphere ❤️</p>
-          </div>
-        `
-      });
-
+    transporter.sendMail({
+      from: `"MediSphere" <${process.env.EMAIL_USER}>`,
+      to: payment.email,
+      subject: "Package Payment Confirmed ✅",
+      html: `
+        <div style="font-family: Arial; padding:20px;">
+          <h2>Package Payment Confirmed ✅</h2>
+          <p><strong>Name:</strong> ${payment.name}</p>
+          <p><strong>Email:</strong> ${payment.email}</p>
+          <p><strong>Phone:</strong> ${payment.phone}</p>
+          <p><strong>Package:</strong> ${payment.packageName}</p>
+          <p><strong>Amount Paid:</strong> ₹${payment.amount}</p>
+          <p><strong>Payment Status:</strong> Confirmed</p>
+          <p>Our team will contact you soon for the next steps.</p>
+        </div>
+      `
+    })
+    .then(() => {
       console.log("Package confirmation email sent successfully");
-    } catch (emailErr) {
+    })
+    .catch((emailErr) => {
       console.error("Package email failed, but payment is confirmed:", emailErr.message);
-    }
+    });
 
     delete global.packagePaymentStore[order_id];
 
