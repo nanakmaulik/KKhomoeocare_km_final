@@ -388,47 +388,53 @@ app.post("/book-online-appointment", async (req, res) => {
   }
 });
 /******** DOCTOR APPROVAL EMAIL ********/
+/******** DOCTOR APPROVAL EMAIL ********/
 app.post("/send-approval-email", async (req, res) => {
   try {
     const { email, name } = req.body;
+
     console.log("🔥 EMAIL API HIT");
-console.log("Email:", email, "Name:", name);
+    console.log("Email:", email, "Name:", name);
 
     if (!email) {
       return res.status(400).json({ error: "Email required" });
     }
 
-    await transporter.sendMail({
-      from: `"MediSphere" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: "Doctor Account Approved 🎉",
-      html: `
-        <div style="font-family: Arial; padding:20px;">
-          
-          <h2 style="color:#2879ff;">Welcome Dr. ${name} 👨‍⚕️</h2>
+    try {
+      await transporter.sendMail({
+        from: `"MediSphere" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: "Doctor Account Approved 🎉",
+        html: `
+          <div style="font-family: Arial; padding:20px;">
+            <h2 style="color:#2879ff;">Welcome Dr. ${name} 👨‍⚕️</h2>
 
-          <p>Your registration request has been <b>approved by admin</b>.</p>
+            <p>Your registration request has been <b>approved by admin</b>.</p>
 
-          <p>You can now login and start using <b>MediSphere</b>.</p>
+            <p>You can now login and start using <b>MediSphere</b>.</p>
 
-          <a href="${FRONTEND_URL}/admin-login.html"
-             style="display:inline-block; padding:10px 20px; background:#2879ff; color:white; text-decoration:none; border-radius:6px;">
-             Login Now
-          </a>
+            <a href="${FRONTEND_URL}/admin-login.html"
+               style="display:inline-block; padding:10px 20px; background:#2879ff; color:white; text-decoration:none; border-radius:6px;">
+               Login Now
+            </a>
 
-          <p style="margin-top:20px; font-size:12px; color:#777;">
-            Thank you for joining our platform ❤️
-          </p>
+            <p style="margin-top:20px; font-size:12px; color:#777;">
+              Thank you for joining our platform ❤️
+            </p>
+          </div>
+        `
+      });
 
-        </div>
-      `
-    });
+      console.log("Doctor approval email sent successfully");
+    } catch (emailErr) {
+      console.error("Approval email failed:", emailErr.message);
+    }
 
     res.json({ success: true });
 
   } catch (err) {
-    console.error("Approval email error:", err);
-    res.status(500).json({ error: "Email sending failed" });
+    console.error("Approval email route error:", err);
+    res.status(500).json({ error: "Approval email route failed" });
   }
 });
 app.post("/send-labtest-email", async (req, res) => {
@@ -612,25 +618,31 @@ app.post("/verify-payment", async (req, res) => {
       .update({ is_booked: true })
       .eq("id", payment.slot_id);
 
-    await transporter.sendMail({
-      from: `"MediSphere" <${process.env.EMAIL_USER}>`,
-      to: `${payment.email},${doctor?.email || ""}`,
-      subject: "Appointment & Payment Confirmed ✅",
-      html: `
-        <h2>Your Appointment is Confirmed</h2>
-        <p><strong>Payment:</strong> Confirmed</p>
-        <p><strong>Patient:</strong> ${payment.patientname}</p>
-        <p><strong>Doctor:</strong> ${doctor?.name || "Doctor"}</p>
-        <p><strong>Date:</strong> ${payment.appointmentdate}</p>
-        <p><strong>Time:</strong> ${payment.appointmenttime}</p>
-        <p><strong>Type:</strong> ${payment.appointmentType}</p>
-        ${
-          meetLink
-            ? `<p><strong>Meet Link:</strong> <a href="${meetLink}">${meetLink}</a></p>`
-            : ""
-        }
-      `
-    });
+      try {
+        await transporter.sendMail({
+          from: `"MediSphere" <${process.env.EMAIL_USER}>`,
+          to: `${payment.email},${doctor?.email || ""}`,
+          subject: "Appointment & Payment Confirmed ✅",
+          html: `
+            <h2>Your Appointment is Confirmed</h2>
+            <p><strong>Payment:</strong> Confirmed</p>
+            <p><strong>Patient:</strong> ${payment.patientname}</p>
+            <p><strong>Doctor:</strong> ${doctor?.name || "Doctor"}</p>
+            <p><strong>Date:</strong> ${payment.appointmentdate}</p>
+            <p><strong>Time:</strong> ${payment.appointmenttime}</p>
+            <p><strong>Type:</strong> ${payment.appointmentType}</p>
+            ${
+              meetLink
+                ? `<p><strong>Meet Link:</strong> <a href="${meetLink}">${meetLink}</a></p>`
+                : ""
+            }
+          `
+        });
+      
+        console.log("Payment confirmation email sent successfully");
+      } catch (emailErr) {
+        console.error("Payment email failed, but appointment is confirmed:", emailErr.message);
+      }
 
     delete global.paymentStore[order_id];
 
@@ -771,33 +783,39 @@ app.post("/verify-package-payment", async (req, res) => {
       });
     }
 
-    await transporter.sendMail({
-      from: `"MediSphere" <${process.env.EMAIL_USER}>`,
-      to: payment.email,
-      subject: "Package Payment Confirmed ✅",
-      html: `
-        <div style="font-family: Arial; padding:20px;">
-          <h2>Package Payment Confirmed ✅</h2>
+    try {
+      await transporter.sendMail({
+        from: `"MediSphere" <${process.env.EMAIL_USER}>`,
+        to: payment.email,
+        subject: "Package Payment Confirmed ✅",
+        html: `
+          <div style="font-family: Arial; padding:20px;">
+            <h2>Package Payment Confirmed ✅</h2>
 
-          <p><strong>Name:</strong> ${payment.name}</p>
-          <p><strong>Email:</strong> ${payment.email}</p>
-          <p><strong>Phone:</strong> ${payment.phone}</p>
-          <p><strong>Package:</strong> ${payment.packageName}</p>
-          <p><strong>Amount Paid:</strong> ₹${payment.amount}</p>
-          <p><strong>Payment Status:</strong> Confirmed</p>
+            <p><strong>Name:</strong> ${payment.name}</p>
+            <p><strong>Email:</strong> ${payment.email}</p>
+            <p><strong>Phone:</strong> ${payment.phone}</p>
+            <p><strong>Package:</strong> ${payment.packageName}</p>
+            <p><strong>Amount Paid:</strong> ₹${payment.amount}</p>
+            <p><strong>Payment Status:</strong> Confirmed</p>
 
-          <p>Our team will contact you soon for the next steps.</p>
+            <p>Our team will contact you soon for the next steps.</p>
 
-          <p>Thank you for choosing MediSphere ❤️</p>
-        </div>
-      `
-    });
+            <p>Thank you for choosing MediSphere ❤️</p>
+          </div>
+        `
+      });
+
+      console.log("Package confirmation email sent successfully");
+    } catch (emailErr) {
+      console.error("Package email failed, but payment is confirmed:", emailErr.message);
+    }
 
     delete global.packagePaymentStore[order_id];
 
     res.json({
       success: true,
-      message: "Package payment verified and email sent"
+      message: "Package payment verified. Email attempted."
     });
 
   } catch (err) {
