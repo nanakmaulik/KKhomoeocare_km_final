@@ -249,7 +249,7 @@ async function loadAppointments() {
       )
     `)
     .eq("patientemail", currentUser.email)
-    .eq("status", "confirmed")
+    .eq("payment_status", "paid")
     .order("created_at", { ascending: false });
 
   if (error) {

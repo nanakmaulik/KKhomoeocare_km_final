@@ -268,22 +268,18 @@ app.post("/book-offline-appointment", async (req, res) => {
       throw new Error("Doctor details not found");
     }
 
-    const { error } = await supabase.from("appointments").insert([
-      {
-        patientname,
-        patientemail: email,
-        phone,
-        appointmentdate,
-        appointmenttime,
-        doctor_id,
-        slot_id,
-        appointment_type: "offline",
-        meet_link: null,
-        status: "pending"
-      }
-    ]);
+    const { error: updateError } = await supabase
+  .from("appointments")
+  .update({
+    status: "confirmed",
+    payment_status: "paid",
+    meet_link: meetLink
+  })
+  .eq("payment_order_id", order_id);
 
-    if (error) throw error;
+if (updateError) {
+  throw updateError;
+}
 
     await supabase
       .from("slots")
@@ -523,18 +519,32 @@ app.post("/create-payment", async (req, res) => {
     const result = await response.json();
     console.log("CASHFREE ORDER RESPONSE:", result);
 
-    global.paymentStore = global.paymentStore || {};
-    global.paymentStore[order_id] = {
-      patientname,
-      email,
-      phone,
-      appointmentdate,
-      appointmenttime,
-      appointmentType,
-      doctor_id,
-      slot_id,
-      amount
-    };
+    const { error: pendingInsertError } = await supabase
+    .from("appointments")
+    .insert([
+      {
+        patientname,
+        patientemail: email,
+        phone,
+        appointmentdate,
+        appointmenttime,
+        doctor_id,
+        slot_id,
+        appointment_type: appointmentType,
+        meet_link: null,
+        status: "pending",
+        payment_status: "pending",
+        payment_order_id: order_id
+      }
+    ]);
+  
+  if (pendingInsertError) {
+    console.error("Pending appointment insert error:", pendingInsertError);
+    return res.status(500).json({
+      success: false,
+      message: "Could not create pending appointment"
+    });
+  }
 
     res.json({
       success: true,
@@ -550,14 +560,19 @@ app.post("/verify-payment", async (req, res) => {
   try {
     const { order_id } = req.body;
 
-    const payment = global.paymentStore?.[order_id];
-
-    if (!payment) {
-      return res.status(400).json({
-        success: false,
-        message: "Payment data not found"
-      });
-    }
+    const { data: payment, error: paymentFetchError } = await supabase
+    .from("appointments")
+    .select("*")
+    .eq("payment_order_id", order_id)
+    .single();
+  
+  if (paymentFetchError || !payment) {
+    console.error("Pending appointment not found:", paymentFetchError);
+    return res.status(400).json({
+      success: false,
+      message: "Pending appointment not found for this payment."
+    });
+  }
 
     const baseUrl =
       process.env.CASHFREE_ENV === "production"
@@ -585,7 +600,7 @@ app.post("/verify-payment", async (req, res) => {
 
     let meetLink = null;
 
-    if (payment.appointmentType === "online") {
+    if (payment.appointment_type === "online") {
       meetLink = await getMeetLinkSafely(payment.appointmentdate, payment.appointmenttime);
     }
     // if (payment.appointmentType === "online" && !meetLink) {
@@ -595,31 +610,20 @@ app.post("/verify-payment", async (req, res) => {
     //   });
     // }
 
-    const { data: doctor } = await supabase
-      .from("doctors")
-      .select("name, email")
-      .eq("id", payment.doctor_id)
-      .single();
+    const { error: updateError } = await supabase
+  .from("appointments")
+  .update({
+    status: "confirmed",
+    payment_status: "paid",
+    meet_link: meetLink
+  })
+  .eq("payment_order_id", order_id);
 
-    const { error } = await supabase.from("appointments").insert([
-      {
-        patientname: payment.patientname,
-        patientemail: payment.email,
-        phone: payment.phone,
-        appointmentdate: payment.appointmentdate,
-        appointmenttime: payment.appointmenttime,
-        doctor_id: payment.doctor_id,
-        slot_id: payment.slot_id,
-        appointment_type: payment.appointmentType,
-        meet_link: meetLink,
-        status: "confirmed",
-        payment_status: "paid",
-        payment_order_id: order_id
-      }
-    ]);
+if (updateError) {
+  throw updateError;
+}
 
-    if (error) throw error;
-
+   
     await supabase
       .from("slots")
       .update({ is_booked: true })
@@ -627,7 +631,7 @@ app.post("/verify-payment", async (req, res) => {
 
       transporter.sendMail({
         from: `"MediSphere" <${process.env.EMAIL_USER}>`,
-        to: `${payment.email},${doctor?.email || ""}`,
+        to: `${payment.patientemail},${doctor?.email || ""}`,
         subject: "Appointment & Payment Confirmed ✅",
         html: `
           <h2>Your Appointment is Confirmed</h2>
@@ -636,7 +640,7 @@ app.post("/verify-payment", async (req, res) => {
           <p><strong>Doctor:</strong> ${doctor?.name || "Doctor"}</p>
           <p><strong>Date:</strong> ${payment.appointmentdate}</p>
           <p><strong>Time:</strong> ${payment.appointmenttime}</p>
-          <p><strong>Type:</strong> ${payment.appointmentType}</p>
+          <p><strong>Type:</strong> ${payment.appointment_type}</p>
           ${
             meetLink
               ? `<p><strong>Meet Link:</strong> <a href="${meetLink}">${meetLink}</a></p>`
@@ -651,7 +655,7 @@ app.post("/verify-payment", async (req, res) => {
         console.error("Payment email failed, but appointment is confirmed:", emailErr.message);
       });
 
-    delete global.paymentStore[order_id];
+    
 
     return res.json({
       success: true,
@@ -722,16 +726,32 @@ app.post("/create-package-payment", async (req, res) => {
       });
     }
 
-    global.packagePaymentStore = global.packagePaymentStore || {};
-
-    global.packagePaymentStore[order_id] = {
-      packageName,
-      amount,
-      name,
-      email,
-      phone
-    };
-
+    const { error: pendingInsertError } = await supabase
+    .from("appointments")
+    .insert([
+      {
+        patientname,
+        patientemail: email,
+        phone,
+        appointmentdate,
+        appointmenttime,
+        doctor_id,
+        slot_id,
+        appointment_type: appointmentType,
+        meet_link: null,
+        status: "pending",
+        payment_status: "pending",
+        payment_order_id: order_id
+      }
+    ]);
+  
+  if (pendingInsertError) {
+    console.error("Pending appointment insert error:", pendingInsertError);
+    return res.status(500).json({
+      success: false,
+      message: "Could not create pending appointment"
+    });
+  }
     res.json({
       success: true,
       order_id,
@@ -757,14 +777,19 @@ app.post("/verify-package-payment", async (req, res) => {
       });
     }
 
-    const payment = global.packagePaymentStore?.[order_id];
-
-    if (!payment) {
-      return res.status(400).json({
-        success: false,
-        message: "Package payment data not found"
-      });
-    }
+    const { data: payment, error: paymentFetchError } = await supabase
+    .from("appointments")
+    .select("*")
+    .eq("payment_order_id", order_id)
+    .single();
+  
+  if (paymentFetchError || !payment) {
+    console.error("Pending appointment not found:", paymentFetchError);
+    return res.status(400).json({
+      success: false,
+      message: "Pending appointment not found for this payment."
+    });
+  }
 
     const baseUrl =
       process.env.CASHFREE_ENV === "production"
@@ -793,13 +818,13 @@ app.post("/verify-package-payment", async (req, res) => {
 
     transporter.sendMail({
       from: `"MediSphere" <${process.env.EMAIL_USER}>`,
-      to: payment.email,
+      to: payment.patientemail,
       subject: "Package Payment Confirmed ✅",
       html: `
         <div style="font-family: Arial; padding:20px;">
           <h2>Package Payment Confirmed ✅</h2>
           <p><strong>Name:</strong> ${payment.name}</p>
-          <p><strong>Email:</strong> ${payment.email}</p>
+          <p><strong>Email:</strong> ${payment.patientemail}</p>
           <p><strong>Phone:</strong> ${payment.phone}</p>
           <p><strong>Package:</strong> ${payment.packageName}</p>
           <p><strong>Amount Paid:</strong> ₹${payment.amount}</p>
