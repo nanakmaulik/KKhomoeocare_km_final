@@ -627,6 +627,12 @@ if (doctorFetchError) {
       .from("slots")
       .update({ is_booked: true })
       .eq("id", payment.slot_id);
+      const recipients = [
+        payment.email,
+        doctor?.email
+      ].filter(Boolean);
+      
+      console.log("Trying to send payment confirmation email to:", recipients);
 
       transporter.sendMail({
         from: `"MediSphere" <${process.env.EMAIL_USER}>`,
