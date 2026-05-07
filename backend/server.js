@@ -146,20 +146,27 @@ async function getMeetLinkSafely(date, time) {
   try {
     console.log("CREDENTIALS PATH:", CREDENTIALS_PATH);
     console.log("CREDENTIALS EXISTS:", fs.existsSync(CREDENTIALS_PATH));
-    console.log("Trying to create meet for:", date, time);
 
+    // ✅ Render/live pe credentials missing hain, to Meet create try mat karo
     if (!fs.existsSync(CREDENTIALS_PATH)) {
-      console.warn("credentials.json not found. Using demo meet link.");
+      console.warn("credentials.json not found. Skipping Google Meet creation.");
+
+      // temporary fallback
       return "https://meet.google.com/demo-link";
     }
 
+    console.log("Trying to create meet for:", date, time);
+
     const link = await createMeetLink(date, time);
+
     console.log("REAL MEET LINK:", link);
 
     return link || "https://meet.google.com/demo-link";
+
   } catch (err) {
-    console.error("Meet link generation failed, using fallback link:");
-    console.error(err);
+    console.error("Meet link generation failed:", err.message);
+
+    // fallback, so appointment confirmation does not fail
     return "https://meet.google.com/demo-link";
   }
 }
@@ -581,12 +588,12 @@ app.post("/verify-payment", async (req, res) => {
     if (payment.appointmentType === "online") {
       meetLink = await getMeetLinkSafely(payment.appointmentdate, payment.appointmenttime);
     }
-    if (payment.appointmentType === "online" && !meetLink) {
-      return res.status(500).json({
-        success: false,
-        message: "Meet link generation failed. Appointment not confirmed."
-      });
-    }
+    // if (payment.appointmentType === "online" && !meetLink) {
+    //   return res.status(500).json({
+    //     success: false,
+    //     message: "Meet link generation failed. Appointment not confirmed."
+    //   });
+    // }
 
     const { data: doctor } = await supabase
       .from("doctors")
