@@ -18,6 +18,11 @@ import { authenticate } from "@google-cloud/local-auth";
 import { google } from "googleapis";
 
 dotenv.config();
+// TEMPORARY DEBUG - HATA DENA BAAD MEIN
+console.log("=== ENV CHECK ===");
+console.log("BREVO_KEY:", process.env.BREVO_API_KEY ? "FOUND - " + process.env.BREVO_API_KEY.slice(0,15) : "❌ NOT FOUND");
+console.log("EMAIL_USER:", process.env.EMAIL_USER || "❌ NOT FOUND");
+console.log("=================");
 const FRONTEND_URL =
   process.env.FRONTEND_URL || "https://nanakmaulik.github.io/KKhomoeocare_km_final";
 
