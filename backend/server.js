@@ -28,17 +28,21 @@ const BACKEND_URL =
  * EXPRESS SETUP
  ******************************/
 const app = express();
-app.use(cors({
+const corsOptions = {
   origin: [
     "http://127.0.0.1:5501",
     "http://localhost:5501",
+    "https://dalbirsinghalgonkothi.online",
+    "https://www.dalbirsinghalgonkothi.online",
     "https://nanakmaulik.github.io",
-    "https://nanakmaulik.github.io/KKhomoeocare_km_final",
-    FRONTEND_URL
+    "https://nanakmaulik.github.io/KKhomoeocare_km_final"
   ],
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
-}));
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const openai = new OpenAI({
