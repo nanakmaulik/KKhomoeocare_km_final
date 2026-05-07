@@ -268,18 +268,22 @@ app.post("/book-offline-appointment", async (req, res) => {
       throw new Error("Doctor details not found");
     }
 
-    const { error: updateError } = await supabase
-  .from("appointments")
-  .update({
-    status: "confirmed",
-    payment_status: "paid",
-    meet_link: meetLink
-  })
-  .eq("payment_order_id", order_id);
-
-if (updateError) {
-  throw updateError;
-}
+    const { error } = await supabase.from("appointments").insert([
+      {
+        patientname,
+        patientemail: email,
+        phone,
+        appointmentdate,
+        appointmenttime,
+        doctor_id,
+        slot_id,
+        appointment_type: "offline",
+        meet_link: null,
+        status: "confirmed"
+      }
+    ]);
+    
+    if (error) throw error;
 
     await supabase
       .from("slots")
@@ -339,22 +343,7 @@ app.post("/book-online-appointment", async (req, res) => {
       appointmenttime
     );
 
-    // const { error } = await supabase.from("appointments").insert([
-    //   {
-    //     patientname,
-    //     patientemail: email,
-    //     phone,
-    //     appointmentdate,
-    //     appointmenttime,
-    //     doctor_id,
-    //     slot_id,
-    //     appointment_type: "online",
-    //     meet_link: meetLink,
-    //     status: "confirmed"
-    //   }
-    // ]);
-
-    // if (error) throw error;
+   
 
     await supabase
       .from("slots")
@@ -392,6 +381,7 @@ app.post("/book-online-appointment", async (req, res) => {
 });
 /******** DOCTOR APPROVAL EMAIL ********/
 /******** DOCTOR APPROVAL EMAIL ********/
+/******** DOCTOR APPROVAL EMAIL ********/
 app.post("/send-approval-email", async (req, res) => {
   try {
     const { email, name } = req.body;
@@ -403,43 +393,44 @@ app.post("/send-approval-email", async (req, res) => {
       return res.status(400).json({ error: "Email required" });
     }
 
-    try {
-      await transporter.sendMail({
-        from: `"MediSphere" <${process.env.EMAIL_USER}>`,
-        to: email,
-        subject: "Doctor Account Approved 🎉",
-        html: `
-          <div style="font-family: Arial; padding:20px;">
-            <h2 style="color:#2879ff;">Welcome Dr. ${name} 👨‍⚕️</h2>
+    transporter.sendMail({
+      from: `"MediSphere" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "Doctor Account Approved 🎉",
+      html: `
+        <div style="font-family: Arial; padding:20px;">
+          <h2 style="color:#2879ff;">Welcome Dr. ${name || ""} 👨‍⚕️</h2>
 
-            <p>Your registration request has been <b>approved by admin</b>.</p>
+          <p>Your registration request has been <b>approved by admin</b>.</p>
 
-            <p>You can now login and start using <b>MediSphere</b>.</p>
+          <p>You can now login and start using <b>MediSphere</b>.</p>
 
-            <a href="${FRONTEND_URL}/admin-login.html"
-               style="display:inline-block; padding:10px 20px; background:#2879ff; color:white; text-decoration:none; border-radius:6px;">
-               Login Now
-            </a>
+          <a href="${FRONTEND_URL}/admin-login.html"
+             style="display:inline-block; padding:10px 20px; background:#2879ff; color:white; text-decoration:none; border-radius:6px;">
+             Login Now
+          </a>
 
-            <p style="margin-top:20px; font-size:12px; color:#777;">
-              Thank you for joining our platform ❤️
-            </p>
-          </div>
-        `
+          <p style="margin-top:20px; font-size:12px; color:#777;">
+            Thank you for joining our platform ❤️
+          </p>
+        </div>
+      `
+    })
+      .then((info) => {
+        console.log("Doctor approval email sent:", info.messageId);
+      })
+      .catch((emailErr) => {
+        console.error("Approval email failed:", emailErr.message);
       });
 
-      console.log("Doctor approval email sent successfully");
-    } catch (emailErr) {
-      console.error("Approval email failed:", emailErr.message);
-    }
-
-    res.json({ success: true });
+    return res.json({ success: true });
 
   } catch (err) {
     console.error("Approval email route error:", err);
-    res.status(500).json({ error: "Approval email route failed" });
+    return res.status(500).json({ error: "Approval email route failed" });
   }
 });
+  
 app.post("/send-labtest-email", async (req, res) => {
   try {
     const { name, email, test, date, time, collectionType } = req.body;
