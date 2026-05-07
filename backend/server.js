@@ -174,26 +174,51 @@ async function getMeetLinkSafely(date, time) {
 /******************************
  * EMAIL (GMAIL SMTP)
  ******************************/
-const transporter = nodemailer.createTransport({
-  host: "smtp-relay.brevo.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  },
-  connectionTimeout: 15000,
-  greetingTimeout: 15000,
-  socketTimeout: 20000
-});
-transporter.verify((error, success) => {
-  if (error) {
-    console.log("❌ SMTP ERROR:", error);
-  } else {
-    console.log("✅ SMTP READY");
-  }
-});
+/******************************
+ * EMAIL (BREVO SMTP)
+ ******************************/
+// const transporter = nodemailer.createTransport({
+//   host: "smtp-relay.brevo.com",
+//   port: 587,
+//   secure: false,
+//   auth: {
+//     user: process.env.EMAIL_USER,
+//     pass: process.env.EMAIL_PASS
+//   },
+//   connectionTimeout: 30000,
+//   greetingTimeout: 30000,
+//   socketTimeout: 30000
+// });
+// transporter.verify((error, success) => {
+//   if (error) {
+//     console.log("❌ SMTP ERROR:", error);
+//   } else {
+//     console.log("✅ SMTP READY");
+//   }
+// });
+// Ye function replace karega transporter.sendMail()
+async function sendEmail({ to, subject, html }) {
+  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "api-key": process.env.BREVO_API_KEY  // Brevo dashboard se lena
+    },
+    body: JSON.stringify({
+      sender: { name: "MediSphere", email: process.env.EMAIL_USER },
+      to: to.map(email => ({ email })),  // array of { email }
+      subject,
+      htmlContent: html
+    })
+  });
 
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(JSON.stringify(err));
+  }
+
+  return response.json();
+}
 /******************************
  * ROUTES
  ******************************/
@@ -292,9 +317,9 @@ app.post("/book-offline-appointment", async (req, res) => {
       .eq("id", slot_id);
 
     try {
-      await transporter.sendMail({
+      await sendEmail({
         from: process.env.EMAIL_USER,
-        to: `${email},${doctor.email}`,
+        to: [email, doctor.email].filter(Boolean),
         subject: "Offline Appointment Confirmation",
         html: `
           <h2>Offline Appointment Confirmed</h2>
@@ -352,9 +377,9 @@ app.post("/book-online-appointment", async (req, res) => {
       .eq("id", slot_id);
 
     try {
-      await transporter.sendMail({
+      await sendEmail({
         from: process.env.EMAIL_USER,
-        to: `${email},${doctor.email}`,
+        to: [email, doctor.email].filter(Boolean),
         subject: "Online Appointment Confirmation",
         html: `
           <h2>Online Appointment Confirmed</h2>
@@ -394,7 +419,7 @@ app.post("/send-approval-email", async (req, res) => {
       return res.status(400).json({ error: "Email required" });
     }
 
-    transporter.sendMail({
+    sendEmail({
       from: `"MediSphere" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Doctor Account Approved 🎉",
@@ -436,7 +461,7 @@ app.post("/send-labtest-email", async (req, res) => {
   try {
     const { name, email, test, date, time, collectionType } = req.body;
 
-    await transporter.sendMail({
+    await sendEmail({
       from: `"MediSphere" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Lab Test Booking Confirmation 🧪",
@@ -635,7 +660,7 @@ if (doctorFetchError) {
       
       console.log("Trying to send payment confirmation email to:", recipients);
 
-      transporter.sendMail({
+      sendEmail({
         from: `"MediSphere" <${process.env.EMAIL_USER}>`,
         to: `${payment.patientemail},${doctor?.email || ""}`,
         subject: "Appointment & Payment Confirmed ✅",
@@ -676,6 +701,102 @@ if (doctorFetchError) {
     });
   }
 });
+// app.post("/create-package-payment", async (req, res) => {
+//   try {
+//     const { packageName, amount, name, email, phone } = req.body;
+
+//     if (!packageName || !amount || !name || !email || !phone) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Missing package payment details"
+//       });
+//     }
+
+//     const order_id = "pkg_order_" + Date.now();
+
+//     const baseUrl =
+//       process.env.CASHFREE_ENV === "production"
+//         ? "https://api.cashfree.com/pg/orders"
+//         : "https://sandbox.cashfree.com/pg/orders";
+
+//     const paymentData = {
+//       order_id,
+//       order_amount: Number(amount),
+//       order_currency: "INR",
+//       customer_details: {
+//         customer_id: "cust_" + Date.now(),
+//         customer_email: email,
+//         customer_name: name,
+//         customer_phone: phone
+//       },
+//       order_meta: {
+//         return_url: `${FRONTEND_URL}/package-payment-success.html?order_id=${order_id}`
+//       }
+//     };
+
+//     const response = await fetch(baseUrl, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//         "x-api-version": "2023-08-01",
+//         "x-client-id": process.env.CASHFREE_APP_ID,
+//         "x-client-secret": process.env.CASHFREE_SECRET_KEY
+//       },
+//       body: JSON.stringify(paymentData)
+//     });
+
+//     const result = await response.json();
+
+//     console.log("CASHFREE PACKAGE ORDER RESPONSE:", result);
+
+//     if (!response.ok || !result.payment_session_id) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Cashfree package payment session failed",
+//         cashfreeError: result
+//       });
+//     }
+
+//     const { error: pendingInsertError } = await supabase
+//     .from("appointments")
+//     .insert([
+//       {
+//         patientname,
+//         patientemail: email,
+//         phone,
+//         appointmentdate,
+//         appointmenttime,
+//         doctor_id,
+//         slot_id,
+//         appointment_type: appointmentType,
+//         meet_link: null,
+//         status: "pending",
+//         payment_status: "pending",
+//         payment_order_id: order_id
+//       }
+//     ]);
+  
+//   if (pendingInsertError) {
+//     console.error("Pending appointment insert error:", pendingInsertError);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Could not create pending appointment"
+//     });
+//   }
+//     res.json({
+//       success: true,
+//       order_id,
+//       payment_session_id: result.payment_session_id
+//     });
+
+//   } catch (err) {
+//     console.error("Create package payment error:", err);
+//     res.status(500).json({
+//       success: false,
+//       message: "Package payment creation failed"
+//     });
+//   }
+// });
 app.post("/create-package-payment", async (req, res) => {
   try {
     const { packageName, amount, name, email, phone } = req.body;
@@ -721,7 +842,6 @@ app.post("/create-package-payment", async (req, res) => {
     });
 
     const result = await response.json();
-
     console.log("CASHFREE PACKAGE ORDER RESPONSE:", result);
 
     if (!response.ok || !result.payment_session_id) {
@@ -732,32 +852,7 @@ app.post("/create-package-payment", async (req, res) => {
       });
     }
 
-    const { error: pendingInsertError } = await supabase
-    .from("appointments")
-    .insert([
-      {
-        patientname,
-        patientemail: email,
-        phone,
-        appointmentdate,
-        appointmenttime,
-        doctor_id,
-        slot_id,
-        appointment_type: appointmentType,
-        meet_link: null,
-        status: "pending",
-        payment_status: "pending",
-        payment_order_id: order_id
-      }
-    ]);
-  
-  if (pendingInsertError) {
-    console.error("Pending appointment insert error:", pendingInsertError);
-    return res.status(500).json({
-      success: false,
-      message: "Could not create pending appointment"
-    });
-  }
+    // ✅ Sirf order_id aur session_id return karo
     res.json({
       success: true,
       order_id,
@@ -772,6 +867,7 @@ app.post("/create-package-payment", async (req, res) => {
     });
   }
 });
+
 app.post("/verify-package-payment", async (req, res) => {
   try {
     const { order_id } = req.body;
@@ -822,7 +918,7 @@ app.post("/verify-package-payment", async (req, res) => {
       });
     }
 
-    transporter.sendMail({
+    sendEmail({
       from: `"MediSphere" <${process.env.EMAIL_USER}>`,
       to: payment.patientemail,
       subject: "Package Payment Confirmed ✅",
@@ -846,7 +942,7 @@ app.post("/verify-package-payment", async (req, res) => {
       console.error("Package email failed, but payment is confirmed:", emailErr.message);
     });
 
-    delete global.packagePaymentStore[order_id];
+    
 
     res.json({
       success: true,
