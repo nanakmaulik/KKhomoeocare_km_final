@@ -396,7 +396,11 @@ async function loadLabTests() {
           <p class="info-line"><strong>Collection:</strong> ${test.collection_type || "N/A"}</p>
           <p class="info-line"><strong>Time Slot:</strong> ${test.time_slot || "N/A"}</p>
           <p class="info-line"><strong>Status:</strong> ${test.status || "pending"}</p>
-
+        <button 
+            onclick="deleteLabTest(${test.id})" 
+            style="margin-top:10px; background:#dc3545; color:white; border:none; padding:8px 14px; border-radius:8px; font-weight:600; cursor:pointer;">
+            🗑️ Delete
+          </button>
         </div>
       </div>
     `;
@@ -405,7 +409,23 @@ async function loadLabTests() {
 
 window.loadAppointments = loadAppointments;
 window.loadLabTests = loadLabTests;
+window.deleteLabTest = async function(id) {
+  const confirm = window.confirm("Are you sure you want to delete this lab test booking?");
+  if (!confirm) return;
 
+  const { error } = await supabase
+    .from("labtestbookings")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    alert("Delete failed: " + error.message);
+    return;
+  }
+
+  alert("Lab test booking deleted!");
+  loadLabTests(); // Refresh list
+};
 window.logoutUser = async function () {
   await supabase.auth.signOut();
   localStorage.clear();
