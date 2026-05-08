@@ -86,11 +86,10 @@ let authClient = null;
 async function getAuth() {
   if (authClient) return authClient;
 
-  console.log("CREDENTIALS PATH:", CREDENTIALS_PATH);
-  console.log("TOKEN PATH:", TOKEN_PATH);
+  const credentials = JSON.parse(
+    Buffer.from(process.env.GOOGLE_CREDENTIALS_BASE64, "base64").toString("utf-8")
+  );
 
-  // ✅ Load credentials.json
-  const credentials = JSON.parse(fs.readFileSync(CREDENTIALS_PATH, "utf-8"));
   const { client_id, client_secret, redirect_uris } = credentials.installed;
 
   const oAuth2Client = new google.auth.OAuth2(
@@ -99,18 +98,43 @@ async function getAuth() {
     redirect_uris[0]
   );
 
-  // ✅ Load token.json if exists
-  if (fs.existsSync(TOKEN_PATH)) {
-    const token = JSON.parse(fs.readFileSync(TOKEN_PATH, "utf-8"));
-    oAuth2Client.setCredentials(token);
-    console.log("✅ TOKEN LOADED SUCCESSFULLY");
-    authClient = oAuth2Client;
-    return authClient;
-  }
+  const token = JSON.parse(
+    Buffer.from(process.env.GOOGLE_TOKEN_BASE64, "base64").toString("utf-8")
+  );
 
-  console.log("❌ token.json not found. Please generate token first.");
-  throw new Error("token.json missing. Run generateToken.js first.");
+  oAuth2Client.setCredentials(token);
+  console.log("✅ Google Auth loaded from env");
+  authClient = oAuth2Client;
+  return authClient;
 }
+// async function getAuth() {
+//   if (authClient) return authClient;
+
+//   console.log("CREDENTIALS PATH:", CREDENTIALS_PATH);
+//   console.log("TOKEN PATH:", TOKEN_PATH);
+
+//   // ✅ Load credentials.json
+//   const credentials = JSON.parse(fs.readFileSync(CREDENTIALS_PATH, "utf-8"));
+//   const { client_id, client_secret, redirect_uris } = credentials.installed;
+
+//   const oAuth2Client = new google.auth.OAuth2(
+//     client_id,
+//     client_secret,
+//     redirect_uris[0]
+//   );
+
+//   // ✅ Load token.json if exists
+//   if (fs.existsSync(TOKEN_PATH)) {
+//     const token = JSON.parse(fs.readFileSync(TOKEN_PATH, "utf-8"));
+//     oAuth2Client.setCredentials(token);
+//     console.log("✅ TOKEN LOADED SUCCESSFULLY");
+//     authClient = oAuth2Client;
+//     return authClient;
+//   }
+
+//   console.log("❌ token.json not found. Please generate token first.");
+//   throw new Error("token.json missing. Run generateToken.js first.");
+// }
 
 async function createMeetLink(date, time) {
   const auth = await getAuth();
@@ -148,29 +172,18 @@ async function createMeetLink(date, time) {
 
 async function getMeetLinkSafely(date, time) {
   try {
-    console.log("CREDENTIALS PATH:", CREDENTIALS_PATH);
-    console.log("CREDENTIALS EXISTS:", fs.existsSync(CREDENTIALS_PATH));
-
-    // ✅ Render/live pe credentials missing hain, to Meet create try mat karo
-    if (!fs.existsSync(CREDENTIALS_PATH)) {
-      console.warn("credentials.json not found. Skipping Google Meet creation.");
-
-      // temporary fallback
+    if (!process.env.GOOGLE_CREDENTIALS_BASE64 || !process.env.GOOGLE_TOKEN_BASE64) {
+      console.warn("Google credentials missing in env. Using demo link.");
       return "https://meet.google.com/demo-link";
     }
 
     console.log("Trying to create meet for:", date, time);
-
     const link = await createMeetLink(date, time);
-
     console.log("REAL MEET LINK:", link);
-
     return link || "https://meet.google.com/demo-link";
 
   } catch (err) {
     console.error("Meet link generation failed:", err.message);
-
-    // fallback, so appointment confirmation does not fail
     return "https://meet.google.com/demo-link";
   }
 }
