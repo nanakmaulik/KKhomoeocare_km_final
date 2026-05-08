@@ -887,30 +887,103 @@ app.post("/create-package-payment", async (req, res) => {
   }
 });
 
+// app.post("/verify-package-payment", async (req, res) => {
+//   try {
+//     const { order_id } = req.body;
+
+//     if (!order_id) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Order ID missing"
+//       });
+//     }
+
+//     const { data: payment, error: paymentFetchError } = await supabase
+//     .from("appointments")
+//     .select("*")
+//     .eq("payment_order_id", order_id)
+//     .single();
+  
+//   if (paymentFetchError || !payment) {
+//     console.error("Pending appointment not found:", paymentFetchError);
+//     return res.status(400).json({
+//       success: false,
+//       message: "Pending appointment not found for this payment."
+//     });
+//   }
+
+//     const baseUrl =
+//       process.env.CASHFREE_ENV === "production"
+//         ? `https://api.cashfree.com/pg/orders/${order_id}`
+//         : `https://sandbox.cashfree.com/pg/orders/${order_id}`;
+
+//     const cfRes = await fetch(baseUrl, {
+//       method: "GET",
+//       headers: {
+//         "x-api-version": "2023-08-01",
+//         "x-client-id": process.env.CASHFREE_APP_ID,
+//         "x-client-secret": process.env.CASHFREE_SECRET_KEY
+//       }
+//     });
+
+//     const cfData = await cfRes.json();
+
+//     console.log("CASHFREE PACKAGE VERIFY RESPONSE:", cfData);
+
+//     if (cfData.order_status !== "PAID") {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Payment not completed"
+//       });
+//     }
+
+//     sendEmail({
+//       from: `"MediSphere" <${process.env.EMAIL_USER}>`,
+//       to: [payment.patientemail].filter(Boolean),
+
+//       subject: "Package Payment Confirmed ✅",
+//       html: `
+//         <div style="font-family: Arial; padding:20px;">
+//           <h2>Package Payment Confirmed ✅</h2>
+//           <p><strong>Name:</strong> ${payment.name}</p>
+//           <p><strong>Email:</strong> ${payment.patientemail}</p>
+//           <p><strong>Phone:</strong> ${payment.phone}</p>
+//           <p><strong>Package:</strong> ${payment.packageName}</p>
+//           <p><strong>Amount Paid:</strong> ₹${payment.amount}</p>
+//           <p><strong>Payment Status:</strong> Confirmed</p>
+//           <p>Our team will contact you soon for the next steps.</p>
+//         </div>
+//       `
+//     })
+//     .then(() => {
+//       console.log("Package confirmation email sent successfully");
+//     })
+//     .catch((emailErr) => {
+//       console.error("Package email failed, but payment is confirmed:", emailErr.message);
+//     });
+
+    
+
+//     res.json({
+//       success: true,
+//       message: "Package payment verified. Email attempted."
+//     });
+
+//   } catch (err) {
+//     console.error("Verify package payment error:", err);
+//     res.status(500).json({
+//       success: false,
+//       message: "Package payment verification failed"
+//     });
+//   }
+// });
 app.post("/verify-package-payment", async (req, res) => {
   try {
     const { order_id } = req.body;
 
     if (!order_id) {
-      return res.status(400).json({
-        success: false,
-        message: "Order ID missing"
-      });
+      return res.status(400).json({ success: false, message: "Order ID missing" });
     }
-
-    const { data: payment, error: paymentFetchError } = await supabase
-    .from("appointments")
-    .select("*")
-    .eq("payment_order_id", order_id)
-    .single();
-  
-  if (paymentFetchError || !payment) {
-    console.error("Pending appointment not found:", paymentFetchError);
-    return res.status(400).json({
-      success: false,
-      message: "Pending appointment not found for this payment."
-    });
-  }
 
     const baseUrl =
       process.env.CASHFREE_ENV === "production"
@@ -927,54 +1000,43 @@ app.post("/verify-package-payment", async (req, res) => {
     });
 
     const cfData = await cfRes.json();
-
     console.log("CASHFREE PACKAGE VERIFY RESPONSE:", cfData);
 
     if (cfData.order_status !== "PAID") {
-      return res.status(400).json({
-        success: false,
-        message: "Payment not completed"
+      return res.status(400).json({ success: false, message: "Payment not completed" });
+    }
+
+    // ✅ Payment confirmed — email bhejo Cashfree data se
+    const customerEmail = cfData.customer_details?.customer_email;
+    const customerName = cfData.customer_details?.customer_name;
+    const amount = cfData.order_amount;
+
+    if (customerEmail) {
+      sendEmail({
+        to: [customerEmail],
+        subject: "Package Payment Confirmed ✅",
+        html: `
+          <div style="font-family: Arial; padding:20px;">
+            <h2>Package Payment Confirmed ✅</h2>
+            <p><strong>Name:</strong> ${customerName}</p>
+            <p><strong>Email:</strong> ${customerEmail}</p>
+            <p><strong>Amount Paid:</strong> ₹${amount}</p>
+            <p><strong>Order ID:</strong> ${order_id}</p>
+            <p>Our team will contact you soon for the next steps.</p>
+          </div>
+        `
+      }).then(() => {
+        console.log("Package email sent successfully");
+      }).catch((err) => {
+        console.error("Package email failed:", err.message);
       });
     }
 
-    sendEmail({
-      from: `"MediSphere" <${process.env.EMAIL_USER}>`,
-      to: [payment.patientemail].filter(Boolean),
-
-      subject: "Package Payment Confirmed ✅",
-      html: `
-        <div style="font-family: Arial; padding:20px;">
-          <h2>Package Payment Confirmed ✅</h2>
-          <p><strong>Name:</strong> ${payment.name}</p>
-          <p><strong>Email:</strong> ${payment.patientemail}</p>
-          <p><strong>Phone:</strong> ${payment.phone}</p>
-          <p><strong>Package:</strong> ${payment.packageName}</p>
-          <p><strong>Amount Paid:</strong> ₹${payment.amount}</p>
-          <p><strong>Payment Status:</strong> Confirmed</p>
-          <p>Our team will contact you soon for the next steps.</p>
-        </div>
-      `
-    })
-    .then(() => {
-      console.log("Package confirmation email sent successfully");
-    })
-    .catch((emailErr) => {
-      console.error("Package email failed, but payment is confirmed:", emailErr.message);
-    });
-
-    
-
-    res.json({
-      success: true,
-      message: "Package payment verified. Email attempted."
-    });
+    res.json({ success: true, message: "Package payment verified." });
 
   } catch (err) {
     console.error("Verify package payment error:", err);
-    res.status(500).json({
-      success: false,
-      message: "Package payment verification failed"
-    });
+    res.status(500).json({ success: false, message: "Package payment verification failed" });
   }
 });
 /******************************
