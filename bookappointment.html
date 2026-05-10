@@ -705,6 +705,7 @@ console.log("loadSlots() function called");
             .from("slots")
             .select("*")
             .eq("doctor_id", doctorId);
+            
 console.log("Slots Data:", slots);
 console.log("Slots Error:", error);
         if(error){
@@ -723,15 +724,24 @@ const groupedDates = {};
 const today = new Date();
 today.setHours(0,0,0,0);
 
+const seenSlots = new Set();
+
 slots.forEach(s => {
 
     const slotDate = new Date(s.slot_date);
     slotDate.setHours(0,0,0,0);
 
-    // ❌ Skip past dates automatically
-    if(slotDate < today) return;
+    // Skip past dates automatically
+    if (slotDate < today) return;
 
-    if(!groupedDates[s.slot_date]) groupedDates[s.slot_date] = [];
+    // Duplicate check: same doctor + same date + same time
+    const uniqueKey = `${s.doctor_id}_${s.slot_date}_${s.slot_time}`;
+
+    if (seenSlots.has(uniqueKey)) return;
+
+    seenSlots.add(uniqueKey);
+
+    if (!groupedDates[s.slot_date]) groupedDates[s.slot_date] = [];
     groupedDates[s.slot_date].push(s);
 });
 
