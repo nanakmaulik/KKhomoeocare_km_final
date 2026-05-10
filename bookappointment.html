@@ -789,6 +789,12 @@ document.querySelectorAll(".date-btn").forEach(btn=>{
     selectedSlot = null;
 
     const now = new Date();
+     // ✅ Pehle time ke hisaab se sort karo
+     slots.sort((a, b) => {
+        const [aH, aM] = a.slot_time.split(":").map(Number);
+        const [bH, bM] = b.slot_time.split(":").map(Number);
+        return (aH * 60 + aM) - (bH * 60 + bM);
+    });
 
     slots.forEach(slot => {
 
