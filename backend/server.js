@@ -871,12 +871,20 @@ app.post("/create-package-payment", async (req, res) => {
       });
     }
 
-    // ✅ Sirf order_id aur session_id return karo
-    res.json({
-      success: true,
-      order_id,
-      payment_session_id: result.payment_session_id
-    });
+   // ✅ Services table mein save karo
+   await supabase.from("services").insert([{
+    name,
+    email,
+    phone,
+    service: packageName
+  }]);
+
+  // ✅ Sirf order_id aur session_id return karo
+  res.json({
+    success: true,
+    order_id,
+    payment_session_id: result.payment_session_id
+  });
 
   } catch (err) {
     console.error("Create package payment error:", err);
