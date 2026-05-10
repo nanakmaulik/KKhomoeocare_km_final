@@ -161,8 +161,9 @@
 const { data: doctorData } = await supabase
     .from("doctors")
     .select("id")
-    .eq("auth_user_id", data.user.id)
-    .single();
+    .eq("is_deleted", false)
+    .or(`auth_user_id.eq.${data.user.id},email.eq.${data.user.email}`)
+    .maybeSingle();
 
 if (doctorData) {
     await supabase.auth.signOut();
