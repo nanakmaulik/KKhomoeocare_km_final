@@ -286,6 +286,20 @@ async function loadAppointments() {
           <p class="info-line"><strong>Status:</strong> ${app.status || "confirmed"}</p>
 
           <p class="info-line">
+            <strong>Status:</strong>
+            <span style="
+              background: ${status === "completed" ? "#198754" : "#0066ff"};
+              color: white;
+              padding: 4px 10px;
+              border-radius: 20px;
+              font-size: 12px;
+              font-weight: 700;
+            ">
+              ${status.toUpperCase()}
+            </span>
+          </p>
+
+          <p class="info-line">
             <strong>Payment:</strong>
             <span class="${paymentStatus === "paid" ? "badge-paid" : "badge-pending"}">
               ${paymentStatus.toUpperCase()}
