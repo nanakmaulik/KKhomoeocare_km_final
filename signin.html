@@ -152,13 +152,25 @@
             email: email,
             password: password
         });
-
         if (error) {
-            alert("❌ Incorrect email or password!");
-            return;
-        }
+    alert("❌ Incorrect email or password!");
+    return;
+}
 
-        alert("✔️ Login Successful!");
+// ✅ Check karo ye doctor toh nahi
+const { data: doctorData } = await supabase
+    .from("doctors")
+    .select("id")
+    .eq("auth_user_id", data.user.id)
+    .single();
+
+if (doctorData) {
+    await supabase.auth.signOut();
+    alert("❌ Doctors please use Doctor Login page.");
+    return;
+}
+
+alert("✔️ Login Successful!");
         
 
         // If redirected from booking page
