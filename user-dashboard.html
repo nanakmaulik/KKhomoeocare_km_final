@@ -269,7 +269,7 @@ async function loadAppointments() {
         fees
       )
     `)
-    .eq("patientemail", currentUser.email)
+    .ilike("patientemail", currentUser.email.trim())
     .eq("payment_status", "paid")
     .order("created_at", { ascending: false });
 
@@ -292,6 +292,7 @@ async function loadAppointments() {
 
   data.forEach(app => {
     const paymentStatus = app.payment_status || "pending";
+    const status = app.status || "confirmed";
 
     box.innerHTML += `
       <div class="col-md-4 col-sm-6 col-12 d-flex">
