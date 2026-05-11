@@ -1051,21 +1051,29 @@ async function loadLabTests() {
                     </span>
                 </p>
 
-                ${
-                    status === "pending"
-                    ? `
-                        <button class="btn btn-success btn-sm w-100"
-                            onclick="markLabTestCompleted('${test.id}')">
-                            Mark as Completed
-                        </button>
-                    `
-                    : `
-                        <button class="btn btn-danger btn-sm w-100"
-                            onclick="deleteLabTest('${test.id}')">
-                            Delete Lab Test
-                        </button>
-                    `
-                }
+               <div class="mt-2">
+
+${
+    status !== "completed"
+    ? `
+    <button class="btn btn-success btn-sm w-100 mb-2"
+        onclick="markCompleted('${app.id}')">
+        ✅ Mark as Completed
+    </button>
+    `
+    : `
+    <button class="btn btn-secondary btn-sm w-100 mb-2" disabled>
+        ✔ Completed
+    </button>
+    `
+}
+
+<button class="btn btn-danger btn-sm w-100"
+    onclick="deleteAppointment('${app.id}')">
+    🗑 Delete Appointment
+</button>
+
+</div>
 
                 <div class="lab-date mt-2">
                     <strong>Booked On:</strong> 
@@ -1474,6 +1482,8 @@ window.markCompleted = async function(id) {
     }
 
     // 2) UI ko turant refresh karo
+    alert("Appointment marked as completed");
+
     loadAppointments();
 };
 // DELETE APPOINTMENTS
