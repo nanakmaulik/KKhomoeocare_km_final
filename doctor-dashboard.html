@@ -41,7 +41,11 @@ transition:0.3s;
 background:#111d40;
 color:white;
 }
-
+.menu.active {
+    background: #111d40;
+    color: white;
+    border-left: 4px solid #4e9fff;
+}
 /* CONTENT */
 
 .content{
@@ -444,7 +448,15 @@ p.classList.remove("active")
 })
 
 document.getElementById(id).classList.add("active")
-
+// ✅ Sidebar active update karo
+document.querySelectorAll(".menu").forEach(m => m.classList.remove("active"));
+    
+    // Current page ke menu ko active karo
+    document.querySelectorAll(".menu").forEach(m => {
+        if (m.getAttribute("onclick") && m.getAttribute("onclick").includes(id)) {
+            m.classList.add("active");
+        }
+    });
 }
 
 </script>

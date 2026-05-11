@@ -39,7 +39,12 @@
       background: #111d40;
       color: white;
     }
-
+    .menu.active-menu {
+  background: #111d40;
+  color: white;
+  border-left: 4px solid #00c6ff;
+  font-weight: 700;
+}
     .content {
       margin-left: 260px;
       padding: 35px;
@@ -147,15 +152,15 @@
 <div class="sidebar">
   <h3>MediSphere</h3>
 
-  <div class="menu" onclick="showPage('appointmentsPage'); loadAppointments();">
+  <div id="appointmentsBtn" class="menu" onclick="showPage('appointmentsPage', this); loadAppointments();">
     📅 My Appointments
   </div>
 
-  <div class="menu" onclick="showPage('labTestsPage'); loadLabTests();">
+  <div id="labTestsBtn" class="menu" onclick="showPage('labTestsPage', this); loadLabTests();">
     🧪 My Lab Tests
   </div>
 
-  <div class="menu" onclick="showPage('profilePage');">
+  <div id="profileBtn" class="menu" onclick="showPage('profilePage', this);">
     👤 My Profile
   </div>
 
@@ -204,12 +209,25 @@ import { supabase } from "./js/supabase.js";
 
 let currentUser = null;
 
-function showPage(id) {
-  document.querySelectorAll(".page").forEach(page => {
-    page.classList.remove("active");
-  });
+function showPage(id, clickedMenu = null) {
 
-  document.getElementById(id).classList.add("active");
+// Hide all pages
+document.querySelectorAll(".page").forEach(page => {
+  page.classList.remove("active");
+});
+
+// Show selected page
+document.getElementById(id).classList.add("active");
+
+// Remove active class from all sidebar buttons
+document.querySelectorAll(".menu").forEach(menu => {
+  menu.classList.remove("active-menu");
+});
+
+// Add active class to clicked button
+if (clickedMenu) {
+  clickedMenu.classList.add("active-menu");
+}
 }
 
 window.showPage = showPage;
@@ -232,6 +250,9 @@ async function checkLogin() {
   document.getElementById("profileId").innerText = currentUser.id;
 
   loadAppointments();
+  document
+  .getElementById("appointmentsBtn")
+  .classList.add("active-menu");
 }
 
 async function loadAppointments() {
