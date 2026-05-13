@@ -172,6 +172,9 @@ textarea.form-control-pro {
             <input type="text" id="specialization" class="form-control-pro" placeholder="Specialization" required>
 
             <input type="text" id="experience" class="form-control-pro" placeholder="Experience (e.g. 5 years)" required>
+            <input type="text" id="degree" class="form-control-pro" placeholder="Degree / Qualification (e.g. MBBS, MD)" required>
+
+<input type="text" id="license" class="form-control-pro" placeholder="Medical License Number" required>
 
             <input type="number" id="fees" class="form-control-pro" placeholder="Consultation Fees" required>
 
@@ -228,6 +231,8 @@ const passVal = document.getElementById("password").value.trim();
 const confirmVal = document.getElementById("confirmPassword").value.trim();
 const specializationVal = document.getElementById("specialization").value.trim();
 const experienceVal = document.getElementById("experience").value.trim();
+const degreeVal = document.getElementById("degree").value.trim();
+const licenseVal = document.getElementById("license").value.trim();
 const feesVal = document.getElementById("fees").value.trim();
 const aboutVal = document.getElementById("about").value.trim();
 
@@ -292,6 +297,8 @@ const imageUrl = urlData.publicUrl;
             email: emailVal,
             specialization: specializationVal,
             experience: experienceVal,
+            degree: degreeVal,
+license: licenseVal,
             fees: feesVal,
             about: aboutVal,
             photo: imageUrl,
