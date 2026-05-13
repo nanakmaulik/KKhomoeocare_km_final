@@ -277,6 +277,9 @@ font-weight:bold;
 <div class="menu" onclick="showPage('labtestPage')">
 🧪 Lab Test Bookings
 </div>
+<div class="menu" onclick="showPage('servicesPage'); loadServices();">
+    💳 Services / Packages
+</div>
 <div class="menu" onclick="showPage('appointmentPage'); loadAppointments();">
     📅 Appointments
 </div>
@@ -436,6 +439,10 @@ Save Slots
 <div id="labtestPage" class="page">
     <h2>Lab Test Bookings</h2>
     <div id="labtestContainer" class="row g-4 mt-4"></div>
+</div>
+<div id="servicesPage" class="page">
+    <h2>Service / Package Bookings</h2>
+    <div id="servicesContainer" class="row g-4 mt-4"></div>
 </div>
 <!-- APPOINTMENT LIST -->
 <div id="appointmentPage" class="page">
@@ -1261,6 +1268,7 @@ ${
         `;
     });
 }
+
 // MARK LAB TEST COMPLETED
 window.markLabTestCompleted = async function(id) {
 
@@ -1299,7 +1307,124 @@ window.deleteLabTest = async function(id) {
 };
 
 
+// LOAD SERVICES / PACKAGE BOOKINGS
+window.loadServices = async function () {
+    const container = document.getElementById("servicesContainer");
+    container.innerHTML = "<p>Loading services...</p>";
 
+    const { data, error } = await supabase
+        .from("services")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        console.log("SERVICES ERROR:", error);
+        container.innerHTML = "<p class='text-danger'>Error loading services</p>";
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        container.innerHTML = "<p>No service/package bookings found.</p>";
+        return;
+    }
+
+    container.innerHTML = "";
+
+    data.forEach(service => {
+        const status = service.status || "pending";
+
+        container.innerHTML += `
+            <div class="col-md-4 d-flex">
+                <div class="lab-card">
+
+                    <div class="lab-title">💳 ${service.service || "Package"}</div>
+
+                    <p class="lab-info"><strong>Name:</strong> ${service.name || "N/A"}</p>
+                    <p class="lab-info"><strong>Email:</strong> ${service.email || "N/A"}</p>
+                    <p class="lab-info"><strong>Phone:</strong> ${service.phone || "N/A"}</p>
+                    <p class="lab-info"><strong>Price:</strong> ₹${service.price || "N/A"}</p>
+
+                    <p class="lab-info">
+                        <strong>Status:</strong>
+                        <span class="badge ${status === "confirmed" ? "bg-success" : "bg-warning"}">
+                            ${status.toUpperCase()}
+                        </span>
+                    </p>
+
+                    <div class="mt-2">
+                        ${
+                            status !== "confirmed"
+                            ? `
+                            <button class="btn btn-success btn-sm w-100 mb-2"
+                                onclick="markServiceConfirmed('${service.id}')">
+                                ✅ Mark as Confirmed
+                            </button>
+                            `
+                            : `
+                            <button class="btn btn-secondary btn-sm w-100 mb-2" disabled>
+                                ✔ Confirmed
+                            </button>
+                            `
+                        }
+
+                        <button class="btn btn-danger btn-sm w-100"
+                            onclick="deleteService('${service.id}')">
+                            🗑 Delete Service
+                        </button>
+                    </div>
+
+                    <div class="lab-date mt-2">
+                        <strong>Booked On:</strong>
+                        ${
+                            service.created_at
+                            ? new Date(service.created_at).toLocaleDateString()
+                            : "N/A"
+                        }
+                    </div>
+
+                </div>
+            </div>
+        `;
+    });
+};
+
+
+// MARK SERVICE CONFIRMED
+window.markServiceConfirmed = async function (id) {
+    const { error } = await supabase
+        .from("services")
+        .update({ status: "confirmed" })
+        .eq("id", id);
+
+    if (error) {
+        console.log("SERVICE CONFIRM ERROR:", error);
+        alert("Service confirm failed");
+        return;
+    }
+
+    alert("Service confirmed successfully");
+    loadServices();
+};
+
+
+// DELETE SERVICE
+window.deleteService = async function (id) {
+    if (!confirm("Delete this service booking?")) return;
+
+    const { error } = await supabase
+        .from("services")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+        console.log("SERVICE DELETE ERROR:", error);
+        alert("Service delete failed");
+        return;
+    }
+
+    alert("Service deleted successfully");
+    loadServices();
+};
 // LOAD TESTIMONIALS
 window.loadTestimonials = async function () {
     // APPROVE TESTIMONIAL
