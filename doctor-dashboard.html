@@ -401,14 +401,26 @@ Save Slots
                 <label>Patients</label>
                 <input id="editPatients" class="form-control mb-2" type="number" min="0">
 
-                <label>Image URL:</label>
-<input id="editImg" class="form-control mb-2">
+                <label>Clinic Address:</label>
+<textarea id="editAddress" class="form-control mb-2" rows="2"></textarea>
 
-<label>Degree Certificate:</label>
+<label>Current Doctor Image:</label>
+<div id="editImgPreview" class="mb-2"></div>
+
+<label>Upload New Doctor Image:</label>
+<input type="file" id="editImgFile" class="form-control mb-2" accept="image/*">
+
+<label>Current Degree Certificate:</label>
 <div id="editDegreeLink" class="mb-2"></div>
 
-<label>Medical License:</label>
+<label>Upload New Degree Certificate:</label>
+<input type="file" id="editDegreeFile" class="form-control mb-2" accept=".pdf,.jpg,.jpeg,.png">
+
+<label>Current Medical License:</label>
 <div id="editLicenseLink" class="mb-2"></div>
+
+<label>Upload New Medical License:</label>
+<input type="file" id="editLicenseFile" class="form-control mb-2" accept=".pdf,.jpg,.jpeg,.png">
 
 <button onclick="updateDoctor()" class="btn btn-primary w-100 mt-3">Update Profile</button>
             </div>
@@ -795,7 +807,20 @@ document.getElementById("editFees").value = data.fees
 document.getElementById("editabout").value = data.about
 document.getElementById("editRating").value = data.rating || 0;
 document.getElementById("editPatients").value = data.patients || 0;
-document.getElementById("editImg").value = data.photo
+document.getElementById("editAddress").value = data.address || "";
+
+document.getElementById("editImgPreview").innerHTML = data.photo
+    ? `<img src="${data.photo}" style="width:120px;height:120px;object-fit:cover;border-radius:10px;">
+       <br><a href="${data.photo}" target="_blank" class="btn btn-outline-dark btn-sm mt-2">View Image</a>`
+    : `<p class="text-danger">Image not uploaded</p>`;
+
+document.getElementById("editDegreeLink").innerHTML = data.degree
+    ? `<a href="${data.degree}" target="_blank" class="btn btn-outline-primary btn-sm">View Degree Certificate</a>`
+    : `<p class="text-danger">Degree not uploaded</p>`;
+
+document.getElementById("editLicenseLink").innerHTML = data.license
+    ? `<a href="${data.license}" target="_blank" class="btn btn-outline-secondary btn-sm">View Medical License</a>`
+    : `<p class="text-danger">License not uploaded</p>`;
 document.getElementById("editDegreeLink").innerHTML = data.degree
     ? `<a href="${data.degree}" target="_blank" class="btn btn-outline-primary btn-sm">View Degree Certificate</a>`
     : `<p class="text-danger">Degree not uploaded</p>`;
@@ -811,43 +836,138 @@ document.getElementById("editLicenseLink").innerHTML = data.license
 
 window.updateDoctor = async function(){
 
-const name = document.getElementById("editName").value
-const email = document.getElementById("editMail").value
-const specialization = document.getElementById("editSpec").value
-const experience = document.getElementById("editExp").value
-const fees = document.getElementById("editFees").value
+const name = document.getElementById("editName").value;
+const email = document.getElementById("editMail").value;
+const specialization = document.getElementById("editSpec").value;
+const experience = document.getElementById("editExp").value;
+const fees = document.getElementById("editFees").value;
 const rating = document.getElementById("editRating").value;
 const patients = document.getElementById("editPatients").value;
-const about = document.getElementById("editabout").value
-const photo = document.getElementById("editImg").value
+const about = document.getElementById("editabout").value;
+const address = document.getElementById("editAddress").value;
 
+// 1. Pehle existing doctor data lao
+const { data: oldDoctor, error: oldError } = await supabase
+    .from("doctors")
+    .select("*")
+    .eq("id", doctorId)
+    .single();
+
+if (oldError || !oldDoctor) {
+    alert("Old doctor data not found");
+    console.log(oldError);
+    return;
+}
+
+// Existing URLs rakho
+let photoUrl = oldDoctor.photo;
+let degreeUrl = oldDoctor.degree;
+let licenseUrl = oldDoctor.license;
+
+// 2. New image upload agar selected hai
+const imageFile = document.getElementById("editImgFile").files[0];
+
+if (imageFile) {
+    const imageFileName = `profiles/${Date.now()}_${imageFile.name}`;
+
+    const { error: imgUploadError } = await supabase.storage
+        .from("doctors")
+        .upload(imageFileName, imageFile);
+
+    if (imgUploadError) {
+        alert("Image upload failed");
+        console.log(imgUploadError);
+        return;
+    }
+
+    const { data: imgUrlData } = supabase.storage
+        .from("doctors")
+        .getPublicUrl(imageFileName);
+
+    photoUrl = imgUrlData.publicUrl;
+}
+
+// 3. New degree upload agar selected hai
+const degreeFile = document.getElementById("editDegreeFile").files[0];
+
+if (degreeFile) {
+    const degreeFileName = `documents/${Date.now()}_degree_${degreeFile.name}`;
+
+    const { error: degreeUploadError } = await supabase.storage
+        .from("doctors")
+        .upload(degreeFileName, degreeFile);
+
+    if (degreeUploadError) {
+        alert("Degree upload failed");
+        console.log(degreeUploadError);
+        return;
+    }
+
+    const { data: degreeUrlData } = supabase.storage
+        .from("doctors")
+        .getPublicUrl(degreeFileName);
+
+    degreeUrl = degreeUrlData.publicUrl;
+}
+
+// 4. New license upload agar selected hai
+const licenseFile = document.getElementById("editLicenseFile").files[0];
+
+if (licenseFile) {
+    const licenseFileName = `documents/${Date.now()}_license_${licenseFile.name}`;
+
+    const { error: licenseUploadError } = await supabase.storage
+        .from("doctors")
+        .upload(licenseFileName, licenseFile);
+
+    if (licenseUploadError) {
+        alert("License upload failed");
+        console.log(licenseUploadError);
+        return;
+    }
+
+    const { data: licenseUrlData } = supabase.storage
+        .from("doctors")
+        .getPublicUrl(licenseFileName);
+
+    licenseUrl = licenseUrlData.publicUrl;
+}
+
+// 5. Doctor update
 const { error } = await supabase
-.from("doctors")
-.update({
-name:name,
-email:email,
-specialization:specialization,
-experience:experience,
-fees:fees,
-rating: parseFloat(rating),
-patients: parseInt(patients),
-about:about,
-photo:photo
-})
-.eq("id", doctorId)
+    .from("doctors")
+    .update({
+        name: name,
+        email: email,
+        specialization: specialization,
+        experience: experience,
+        address: address,
+        fees: fees,
+        rating: parseFloat(rating),
+        patients: parseInt(patients),
+        about: about,
+        photo: photoUrl,
+        degree: degreeUrl,
+        license: licenseUrl
+    })
+    .eq("id", doctorId);
 
 if(error){
-alert("Update failed")
-return
+    alert("Update failed");
+    console.log(error);
+    return;
 }
 
-alert("Profile updated successfully")
+alert("Profile updated successfully");
 
-showPage("doctorList")
+document.getElementById("editImgFile").value = "";
+document.getElementById("editDegreeFile").value = "";
+document.getElementById("editLicenseFile").value = "";
 
-loadDoctors()
+editDoctor(doctorId);
+loadDoctors();
 
-}
+};
 /* MANAGING SLOTS */
 let currentDoctor = null;
 let slots = [];
