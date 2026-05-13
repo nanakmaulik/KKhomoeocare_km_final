@@ -228,6 +228,24 @@ font-weight:bold;
     font-weight:700;
     margin:5px 6px 0 0;
 }
+/* APPOINTMENT CARD FIX */
+#appointmentList .col-md-4{
+    display:flex;
+}
+
+#appointmentList .lab-card{
+    width:100%;
+    min-height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+}
+#appointmentPage .lab-card{
+    border-radius:16px;
+    padding:24px;
+    background:#fff;
+    box-shadow:0 8px 24px rgba(0,0,0,0.08);
+}
 </style>
 </head>
 
@@ -512,21 +530,28 @@ async function checkLogin() {
 
 checkLogin();
 function setupDoctorDashboard() {
-document.querySelector(".menu[onclick=\"logoutUser()\"]").style.display = "block";
+
 // ❌ Sab menu hide
 document.querySelectorAll(".menu").forEach(menu => {
     menu.style.display = "none";
 });
 
-// ✅ Sirf doctor ke relevant menu show
-document.querySelector(".menu[onclick=\"showPage('editprofile')\"]").style.display = "block";
-document.querySelector(".menu[onclick=\"showPage('slotsPage')\"]").style.display = "block";
-document.querySelector(".menu[onclick=\"showPage('appointmentPage'); loadAppointments();\"]").style.display = "block";
-document.querySelector(".menu[onclick=\"showPage('doctorSlotListPage'); loadDoctorSlotsMonthWise();\"]").style.display = "block";
-document.querySelector(".menu[onclick=\"logoutUser()\"]").style.display = "block";
+// ✅ Doctor-only menus show
+document.querySelector('.menu[onclick="showPage(\'editprofile\')"]').style.display = "block";
 
+document.querySelector('.menu[onclick="showPage(\'slotsPage\')"]').style.display = "block";
 
-// ✅ Sirf apna data load
+document.querySelector('.menu[onclick="showPage(\'appointmentPage\'); loadAppointments();"]').style.display = "block";
+
+document.querySelector('.menu[onclick="showPage(\'doctorSlotListPage\'); loadDoctorSlotsMonthWise();"]').style.display = "block";
+
+document.querySelector('.menu[onclick="logoutUser()"]').style.display = "block";
+
+// ✅ Open doctor dashboard default page
+showPage("appointmentPage");
+loadAppointments();
+
+// doctor data load
 editDoctor(loggedInDoctor.id);
 openSlotManager(loggedInDoctor.id, loggedInDoctor.name);
 }
@@ -1414,7 +1439,7 @@ const { data, error } = await query;
         let status = app.status || "pending";
 
         container.innerHTML += `
-        <div class="col-md-4 col-sm-6 col-12 d-flex">
+        <div class="col-lg-4 col-md-6 col-12 mb-4">
             <div class="lab-card">
 
                 <div class="lab-title">📅 Appointment</div>
