@@ -159,6 +159,9 @@
   <div id="labTestsBtn" class="menu" onclick="showPage('labTestsPage', this); loadLabTests();">
     🧪 My Lab Tests
   </div>
+  <div id="servicesBtn" class="menu" onclick="showPage('servicesPage', this); loadServices();">
+    💳 My Packages
+  </div>
 
   <div id="profileBtn" class="menu" onclick="showPage('profilePage', this);">
     👤 My Profile
@@ -191,7 +194,11 @@
     <h3 class="mb-4">My Lab Test Bookings</h3>
     <div id="labTestsBox" class="row g-4">Loading lab tests...</div>
   </div>
-
+<!-- SERVICES / PACKAGES PAGE -->
+<div id="servicesPage" class="page">
+  <h3 class="mb-4">My Packages / Services</h3>
+  <div id="servicesBox" class="row g-4">Loading packages...</div>
+</div>
   <!-- PROFILE PAGE -->
   <div id="profilePage" class="page">
     <h3 class="mb-4">My Profile</h3>
@@ -441,9 +448,76 @@ async function loadLabTests() {
     `;
   });
 }
+async function loadServices() {
+  const box = document.getElementById("servicesBox");
+  box.innerHTML = "<p>Loading packages...</p>";
 
+  const userEmail = currentUser.email.trim().toLowerCase();
+
+  const { data, error } = await supabase
+    .from("services")
+    .select("*")
+    .ilike("email", userEmail)
+    .order("created_at", { ascending: false });
+
+  console.log("SERVICES DATA:", data);
+  console.log("SERVICES ERROR:", error);
+
+  if (error) {
+    console.log("Services load error:", error);
+    box.innerHTML = `<div class="empty-box">Error loading packages.</div>`;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    box.innerHTML = `
+      <div class="empty-box">
+        No package/service bookings found for ${userEmail}.
+      </div>
+    `;
+    return;
+  }
+
+  box.innerHTML = "";
+
+  data.forEach(service => {
+    const status = service.status || "pending";
+
+    box.innerHTML += `
+      <div class="col-md-4 col-sm-6 col-12 d-flex">
+        <div class="dash-card">
+
+          <div class="dash-title">💳 ${service.service || "Package"}</div>
+
+          <p class="info-line"><strong>Name:</strong> ${service.name || "N/A"}</p>
+          <p class="info-line"><strong>Email:</strong> ${service.email || "N/A"}</p>
+          <p class="info-line"><strong>Phone:</strong> ${service.phone || "N/A"}</p>
+          <p class="info-line"><strong>Price:</strong> ₹${service.price || "N/A"}</p>
+
+          <p class="info-line">
+            <strong>Status:</strong>
+            <span class="${status === "confirmed" ? "badge-paid" : "badge-pending"}">
+              ${status.toUpperCase()}
+            </span>
+          </p>
+
+          <p class="info-line">
+            <strong>Booked On:</strong>
+            ${
+              service.created_at
+              ? new Date(service.created_at).toLocaleDateString()
+              : "N/A"
+            }
+          </p>
+
+        </div>
+      </div>
+    `;
+  });
+}
 window.loadAppointments = loadAppointments;
 window.loadLabTests = loadLabTests;
+window.loadServices = loadServices;
 window.deleteLabTest = async function(id) {
   const confirm = window.confirm("Are you sure you want to delete this lab test booking?");
   if (!confirm) return;
