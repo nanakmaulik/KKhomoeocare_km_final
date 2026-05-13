@@ -642,6 +642,20 @@ container.innerHTML += `
 <p class="mb-1">👥 Patients : ${doc.patients || "0"}</p>
 <p>Fees : ₹${doc.fees}</p>
 
+<div class="mb-2">
+    ${
+        doc.degree
+        ? `<a href="${doc.degree}" target="_blank" class="btn btn-outline-primary btn-sm w-100 mb-2">View Degree Certificate</a>`
+        : `<p class="text-danger mb-1">Degree not uploaded</p>`
+    }
+
+    ${
+        doc.license
+        ? `<a href="${doc.license}" target="_blank" class="btn btn-outline-secondary btn-sm w-100 mb-2">View Medical License</a>`
+        : `<p class="text-danger mb-1">License not uploaded</p>`
+    }
+</div>
+
 </div>
 
 <div class="card-buttons">
@@ -1563,9 +1577,23 @@ window.loadDoctorRequests = async function () {
                 <h5 class="mt-2">${doc.name}</h5>
                 <p><strong>Email:</strong> ${doc.email}</p>
                 <p><strong>Specialization:</strong> ${doc.specialization}</p>
-                <p><strong>Experience:</strong> ${doc.experience}</p>
-                <p><strong>Fees:</strong> ₹${doc.fees}</p>
-                <p>${doc.about || ""}</p>
+               <p><strong>Experience:</strong> ${doc.experience}</p>
+<p><strong>Fees:</strong> ₹${doc.fees}</p>
+<p>${doc.about || ""}</p>
+
+<div class="mb-2">
+    ${
+        doc.degree
+        ? `<a href="${doc.degree}" target="_blank" class="btn btn-primary btn-sm w-100 mb-2">View Degree Certificate</a>`
+        : `<p class="text-danger mb-1">Degree not uploaded</p>`
+    }
+
+    ${
+        doc.license
+        ? `<a href="${doc.license}" target="_blank" class="btn btn-secondary btn-sm w-100 mb-2">View Medical License</a>`
+        : `<p class="text-danger mb-1">License not uploaded</p>`
+    }
+</div>
 
                 <button class="btn btn-success btn-sm w-100 mb-2" onclick="approveDoctorRequest('${doc.id}')">
                     Accept
@@ -1593,18 +1621,20 @@ window.approveDoctorRequest = async function (requestId) {
     }
 
     const { error: insertError } = await supabase
-        .from("doctors")
-        .insert([{
-            name: request.name,
-            email: request.email,
-            specialization: request.specialization,
-            experience: request.experience,
-            fees: request.fees,
-            about: request.about,
-            photo: request.photo,
-            auth_user_id: request.auth_user_id,
-            is_deleted: false
-        }]);
+    .from("doctors")
+.insert([{
+    name: request.name,
+    email: request.email,
+    specialization: request.specialization,
+    experience: request.experience,
+    degree: request.degree,
+    license: request.license,
+    fees: request.fees,
+    about: request.about,
+    photo: request.photo,
+    auth_user_id: request.auth_user_id,
+    is_deleted: false
+}]);
 
     if (insertError) {
         console.log(insertError);

@@ -172,9 +172,11 @@ textarea.form-control-pro {
             <input type="text" id="specialization" class="form-control-pro" placeholder="Specialization" required>
 
             <input type="text" id="experience" class="form-control-pro" placeholder="Experience (e.g. 5 years)" required>
-            <input type="text" id="degree" class="form-control-pro" placeholder="Degree / Qualification (e.g. MBBS, MD)" required>
+            <label>Degree Certificate</label>
+<input type="file" id="degreeFile" class="form-control-pro" accept=".pdf,.jpg,.jpeg,.png" required>
 
-<input type="text" id="license" class="form-control-pro" placeholder="Medical License Number" required>
+<label>Medical License Document</label>
+<input type="file" id="licenseFile" class="form-control-pro" accept=".pdf,.jpg,.jpeg,.png" required>
 
             <input type="number" id="fees" class="form-control-pro" placeholder="Consultation Fees" required>
 
@@ -231,8 +233,7 @@ const passVal = document.getElementById("password").value.trim();
 const confirmVal = document.getElementById("confirmPassword").value.trim();
 const specializationVal = document.getElementById("specialization").value.trim();
 const experienceVal = document.getElementById("experience").value.trim();
-const degreeVal = document.getElementById("degree").value.trim();
-const licenseVal = document.getElementById("license").value.trim();
+
 const feesVal = document.getElementById("fees").value.trim();
 const aboutVal = document.getElementById("about").value.trim();
 
@@ -288,6 +289,45 @@ const { data: urlData } = client.storage
     .getPublicUrl(fileName);
 
 const imageUrl = urlData.publicUrl;
+// DEGREE FILE UPLOAD
+const degreeFile = document.getElementById("degreeFile").files[0];
+const degreeFileName = `${Date.now()}_degree_${degreeFile.name}`;
+
+const { error: degreeUploadError } = await client.storage
+    .from("doctors")
+    .upload("documents/" + degreeFileName, degreeFile);
+
+if (degreeUploadError) {
+    msg.style.color = "red";
+    msg.textContent = degreeUploadError.message;
+    return;
+}
+
+const { data: degreeUrlData } = client.storage
+    .from("doctors")
+    .getPublicUrl("documents/" + degreeFileName);
+
+const degreeUrl = degreeUrlData.publicUrl;
+
+// LICENSE FILE UPLOAD
+const licenseFile = document.getElementById("licenseFile").files[0];
+const licenseFileName = `${Date.now()}_license_${licenseFile.name}`;
+
+const { error: licenseUploadError } = await client.storage
+    .from("doctors")
+    .upload("documents/" + licenseFileName, licenseFile);
+
+if (licenseUploadError) {
+    msg.style.color = "red";
+    msg.textContent = licenseUploadError.message;
+    return;
+}
+
+const { data: licenseUrlData } = client.storage
+    .from("doctors")
+    .getPublicUrl("documents/" + licenseFileName);
+
+const licenseUrl = licenseUrlData.publicUrl;
 
     // 🔥 STEP 2: SAVE DATA
     const { error: dbError } = await client
@@ -297,8 +337,8 @@ const imageUrl = urlData.publicUrl;
             email: emailVal,
             specialization: specializationVal,
             experience: experienceVal,
-            degree: degreeVal,
-license: licenseVal,
+            degree: degreeUrl,
+license: licenseUrl,
             fees: feesVal,
             about: aboutVal,
             photo: imageUrl,
