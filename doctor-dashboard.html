@@ -402,9 +402,15 @@ Save Slots
                 <input id="editPatients" class="form-control mb-2" type="number" min="0">
 
                 <label>Image URL:</label>
-                <input id="editImg" class="form-control mb-2">
+<input id="editImg" class="form-control mb-2">
 
-                <button onclick="updateDoctor()" class="btn btn-primary w-100 mt-3">Update Profile</button>
+<label>Degree Certificate:</label>
+<div id="editDegreeLink" class="mb-2"></div>
+
+<label>Medical License:</label>
+<div id="editLicenseLink" class="mb-2"></div>
+
+<button onclick="updateDoctor()" class="btn btn-primary w-100 mt-3">Update Profile</button>
             </div>
         </div>
 
@@ -635,7 +641,7 @@ container.innerHTML += `
 <p class="text-muted mb-1">${doc.specialization}</p>
 <p class="text-muted mb-1">${doc.email}</p>
 <p class="text-muted mb-1">${doc.about}</p>
-
+<p class="text-muted mb-1"><strong>Address:</strong> ${doc.address || "N/A"}</p>
 
 <p class="mb-1">Experience : ${doc.experience}</p>
 <p class="mb-1">⭐ Rating : ${doc.rating || "N/A"}</p>
@@ -790,6 +796,13 @@ document.getElementById("editabout").value = data.about
 document.getElementById("editRating").value = data.rating || 0;
 document.getElementById("editPatients").value = data.patients || 0;
 document.getElementById("editImg").value = data.photo
+document.getElementById("editDegreeLink").innerHTML = data.degree
+    ? `<a href="${data.degree}" target="_blank" class="btn btn-outline-primary btn-sm">View Degree Certificate</a>`
+    : `<p class="text-danger">Degree not uploaded</p>`;
+
+document.getElementById("editLicenseLink").innerHTML = data.license
+    ? `<a href="${data.license}" target="_blank" class="btn btn-outline-secondary btn-sm">View Medical License</a>`
+    : `<p class="text-danger">License not uploaded</p>`;
 
 }
 
@@ -1578,6 +1591,7 @@ window.loadDoctorRequests = async function () {
                 <p><strong>Email:</strong> ${doc.email}</p>
                 <p><strong>Specialization:</strong> ${doc.specialization}</p>
                <p><strong>Experience:</strong> ${doc.experience}</p>
+               <p><strong>Experience:</strong> ${doc.experience}</p>
 <p><strong>Fees:</strong> ₹${doc.fees}</p>
 <p>${doc.about || ""}</p>
 
@@ -1627,6 +1641,7 @@ window.approveDoctorRequest = async function (requestId) {
     email: request.email,
     specialization: request.specialization,
     experience: request.experience,
+    address: request.address,
     degree: request.degree,
     license: request.license,
     fees: request.fees,

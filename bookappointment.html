@@ -643,7 +643,7 @@ console.log("Doctor ID:", doctorId);
       </div>
   </div>
 
-  <div class="doctor-contact">
+<div class="doctor-contact">
     <p>
       <i class="bi bi-envelope-fill"></i>
       <a href="https://mail.google.com/mail/?view=cm&fs=1&to=${data.email}" 
@@ -652,6 +652,32 @@ console.log("Doctor ID:", doctorId);
          ${data.email}
       </a>
     </p>
+  </div>
+  <p>
+  <i class="bi bi-geo-alt-fill"></i>
+  ${data.address || "Address not available"}
+</p>
+
+  <div class="doctor-about">
+      <h4>Doctor Documents</h4>
+
+      <div class="d-flex gap-2 flex-wrap">
+        ${
+          data.degree
+          ? `<a href="${data.degree}" target="_blank" class="btn btn-outline-primary btn-sm">
+                View Degree Certificate
+             </a>`
+          : `<span class="text-danger fw-bold">Degree not uploaded</span>`
+        }
+
+        ${
+          data.license
+          ? `<a href="${data.license}" target="_blank" class="btn btn-outline-secondary btn-sm">
+                View Medical License
+             </a>`
+          : `<span class="text-danger fw-bold">License not uploaded</span>`
+        }
+      </div>
   </div>
 
   <div class="doctor-about">
