@@ -1179,6 +1179,10 @@ async function loadLabTests() {
     }
 
     container.innerHTML = "";
+    if (!data || data.length === 0) {
+    container.innerHTML = "<p>No lab test bookings found.</p>";
+    return;
+}
 
     data.forEach(test => {
 
@@ -1223,13 +1227,13 @@ async function loadLabTests() {
                     </span>
                 </p>
 
-               <div class="mt-2">
+              <div class="mt-2">
 
 ${
     status !== "completed"
     ? `
     <button class="btn btn-success btn-sm w-100 mb-2"
-        onclick="markCompleted('${app.id}')">
+        onclick="markLabTestCompleted('${test.id}')">
         ✅ Mark as Completed
     </button>
     `
@@ -1241,8 +1245,8 @@ ${
 }
 
 <button class="btn btn-danger btn-sm w-100"
-    onclick="deleteAppointment('${app.id}')">
-    🗑 Delete Appointment
+    onclick="deleteLabTest('${test.id}')">
+    🗑 Delete Lab Test
 </button>
 
 </div>
