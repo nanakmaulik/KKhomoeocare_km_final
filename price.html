@@ -408,6 +408,23 @@
               email,
               phone
             });
+// ✅ Save service/package request in Supabase
+const { error: serviceError } = await supabase
+  .from("services")
+  .insert([{
+    name: name,
+    email: email,
+    phone: phone,
+    service: packageName,
+    price: amount,
+    status: "pending"
+  }]);
+
+if (serviceError) {
+  console.log("SERVICE INSERT ERROR:", serviceError);
+  alert("Service request database me save nahi hui.");
+  return;
+}
         
             const response = await fetch("https://kkhomoeocare-km-final-1.onrender.com/create-package-payment", {
               method: "POST",
